@@ -1,0 +1,35 @@
+Name:                prizm
+Version:             0.1.0.0
+Synopsis:            A haskell library for computing with colors
+-- Description:         
+Homepage:            https://github.com/ixmatus/prizm
+License:             BSD3
+License-file:        LICENSE
+Author:              Parnell Springmeyer
+Maintainer:          ixmatus@gmail.com
+Copyright:           (c) 2013 Parnell Springmeyer
+Category:            Graphics Web
+Build-type:          Simple
+Stability:           alpha
+Bug-reports:         https://github.com/ixmatus/prizm/issues
+Package-url:         http://hackage.haskell.org/package/prizm
+Tested-with:         GHC == 7.4.2
+Cabal-version:       >=1.14.0
+
+extra-source-files:
+    LICENSE
+    README.md
+
+source-repository head
+  type:     git
+  location: https://github.com/ixmatus/prizm
+
+library
+  hs-source-dirs: src
+  
+  exposed-modules:
+    Prizm
+  
+  ghc-options: -Wall
+  
+  build-depends:       base ==4.5.*
