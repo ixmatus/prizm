@@ -3,7 +3,7 @@ prizm
 
 A haskell library for dealing with colors.
 
-My original inspiration for writing this was Sass and Bourbon, both implement interesting color handling functions for
+My inspiration for writing this was Sass and Bourbon, both implement interesting color handling functions for
 use in stylesheets and I wanted the same thing for use in [Clay](http://fvisser.nl/clay/) (also for
 [Bentonite](https://github.com/ixmatus/bentonite)).
 
@@ -11,7 +11,6 @@ use in stylesheets and I wanted the same thing for use in [Clay](http://fvisser.
 
 - sRGB -> CIE XYZ
 - CIE XYZ -> sRGB
-
 
 ## Roadmap
 
