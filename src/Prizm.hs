@@ -1,8 +1,12 @@
 module Prizm
 (
-  module Prizm.Color.Transform
-, module Prizm.Types
+  module Prizm.Types
+, module Prizm.Color.Transform
+, module Prizm.Color.SRGB
+, module Prizm.Color.CIE
 ) where
 
-import Prizm.Color.Transform
 import Prizm.Types
+import Prizm.Color.Transform
+import Prizm.Color.CIE
+import Prizm.Color.SRGB
