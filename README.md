@@ -1,7 +1,7 @@
-prizm
+Welcome!
 =====
 
-A haskell library for dealing with colors.
+Prizm is a haskell library for dealing with colors. Please contribute!
 
 My inspiration for writing this was Sass and Bourbon, both implement interesting color handling functions for
 use in stylesheets and I wanted the same thing for use in [Clay](http://fvisser.nl/clay/) (also for
