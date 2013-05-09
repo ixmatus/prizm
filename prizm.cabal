@@ -5,7 +5,7 @@ Synopsis:            A haskell library for computing with colors
 Description:         Prizm can convert between many different color
                      representations; notably the sRGB and CIE
                      representations. Future versions will
-                     implementations for mutating colors as well.
+                     have implementations for mutating colors as well.
 
 Homepage:            https://github.com/ixmatus/prizm
 License:             BSD3
