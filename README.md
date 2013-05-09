@@ -7,6 +7,11 @@ My inspiration for writing this was Sass and Bourbon, both implement interesting
 use in stylesheets and I wanted the same thing for use in [Clay](http://fvisser.nl/clay/) (also for
 [Bentonite](https://github.com/ixmatus/bentonite)).
 
+## Colour Module
+
+There is some overlap with the Haskell Colour Module that already exists; however, this library is filling a couple of
+needs the other doesn't satisfy. I also want to have a cleaner API to work with.
+
 ## Supported Algorithms
 
 - sRGB -> CIE XYZ
