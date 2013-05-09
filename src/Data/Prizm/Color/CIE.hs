@@ -1,10 +1,10 @@
-module Prizm.Color.CIE
+module Data.Prizm.Color.CIE
 (
   toRGB
 ) where
 
-import Prizm.Types
-import Prizm.Color.Transform
+import Data.Prizm.Types
+import Data.Prizm.Color.Transform
 
 import Control.Applicative
 

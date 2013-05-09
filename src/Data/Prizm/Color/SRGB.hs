@@ -1,10 +1,10 @@
-module Prizm.Color.SRGB
+module Data.Prizm.Color.SRGB
 (
   toXYZ
 ) where
 
-import Prizm.Types
-import Prizm.Color.Transform
+import Data.Prizm.Types
+import Data.Prizm.Color.Transform
 
 import Control.Applicative
 

@@ -1,4 +1,4 @@
-module Prizm.Types where
+module Data.Prizm.Types where
 
 data SRGB
     = SRGB Integer Integer Integer

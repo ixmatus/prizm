@@ -1,4 +1,4 @@
--- module Prizm.Color where
+-- module Data.Prizm.Color where
 
 -- pct :: Integer -> Double
 -- pct = (/100) . fromIntegral . (max 0) . (min 100)

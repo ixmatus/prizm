@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Prizm.Color.Transform where
+module Data.Prizm.Color.Transform where
 
 import Control.Applicative
 
