@@ -16,6 +16,8 @@ Package-url:         http://hackage.haskell.org/package/prizm
 Tested-with:         GHC == 7.4.2
 Cabal-version:       >=1.14.0
 
+default-language:    Haskell2010
+
 extra-source-files:
     LICENSE
     README.md

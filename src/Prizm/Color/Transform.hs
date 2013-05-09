@@ -22,16 +22,16 @@ xyzToRGBmatrix = [
   [(-0.9689), 1.8758, 0.0415],
   [0.0557, (-0.2040), 1.0570]]
 
--- | @transform@ transform an RGB integer to a decimal value.
--- 
--- The formula for this transformation can be found here:
--- http://en.wikipedia.org/wiki/SRGB
+-- | @rgbTransform@ transform an RGB integer to be computed against
+-- the rgbToXYZ matrix.
 rgbTransform :: Integer -> Double
 rgbTransform v | dv > 0.04045 = (((dv + 0.055) / ap) ** 2.4) * 100
                | otherwise    = (dv / 12.92) * 100
     where dv = fromIntegral v / 255
           ap = 1.0 + 0.055
 
+-- | @xyzTransform@ transform an XYZ integer to be computed against
+-- the xyzToRGB matrix.
 xyzTransform :: Double -> Integer
 xyzTransform v | v > 0.0031308 = min (truncate ((1.055 * (v ** (1 / 2.4)) - 0.055) * 255)) 255
                | otherwise     = min (truncate ((12.92 * v) * 255)) 255
