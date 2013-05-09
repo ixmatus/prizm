@@ -21,9 +21,13 @@ transform v | v > 0.0031308 = min (truncate ((1.055 * (v ** (1 / 2.4)) - 0.055) 
             | otherwise     = min (truncate ((12.92 * v) * 255)) 255
 
 -- | @toRGB@ convert a CIE color to an SRGB color.
-toRGB :: CIE -> Maybe SRGB
-toRGB (LAB _ _ _) = Nothing
+-- 
+-- Once I've implemented CIE L*a*b -> XYZ and vice-versa functions
+-- then I'll introduce the type exhaustively here to handle any CIE
+-- color -> SRGB conversion.
+toRGB :: CIE -> SRGB
+--toRGB (LAB _ _ _) = Nothing
 toRGB (XYZ x y z) =
     let t = ZipList ((/100) <$> [x,y,z])
         [r,g,b] = (transform) <$> ((zipTransform t) <$> matrix)
-    in Just (SRGB r g b)
+    in SRGB r g b

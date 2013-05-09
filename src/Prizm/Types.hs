@@ -5,6 +5,6 @@ data SRGB
     deriving (Eq, Ord, Show)
 
 data CIE
-    = LAB Double Double Double
-    | XYZ Double Double Double
+    = XYZ Double Double Double
+--    | LAB Double Double Double
     deriving (Eq, Ord, Show)
