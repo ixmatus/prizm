@@ -27,4 +27,4 @@ Implementations for
 - saturation
 - inversion
 
-[Algorithm Sources](http://www.easyrgb.com/index.php?X=MATH&H=01)
+[Conversion Algorithm Sources](http://www.easyrgb.com/index.php?X=MATH&H=01)
