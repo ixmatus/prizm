@@ -17,8 +17,8 @@ matrix = [
 -- | @transform@ transform an XYZ integer to be computed against
 -- the xyzToRGB matrix.
 transform :: Double -> Integer
-transform v | v > 0.0031308 = min (truncate ((1.055 * (v ** (1 / 2.4)) - 0.055) * 255)) 255
-            | otherwise     = min (truncate ((12.92 * v) * 255)) 255
+transform v | v > 0.0031308 = min (truncate $ roundN 3 ((1.055 * (v ** (1 / 2.4)) - 0.055) * 255)) 255
+            | otherwise     = min (truncate $ roundN 3 ((12.92 * v) * 255)) 255
 
 -- | @toRGB@ convert a CIE color to an SRGB color.
 -- 

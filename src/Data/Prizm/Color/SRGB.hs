@@ -26,5 +26,5 @@ transform v | dv > 0.04045 = (((dv + 0.055) / ap) ** 2.4) * 100
 toXYZ :: SRGB -> CIE
 toXYZ (SRGB r g b) =
     let t = ZipList (transform <$> [r,g,b])
-        [x,y,z] = (zipTransform t) <$> matrix
+        [x,y,z] = (roundN 3) <$> ((zipTransform t) <$> matrix)
     in XYZ x y z
