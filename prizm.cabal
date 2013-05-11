@@ -38,6 +38,8 @@ library
     Data.Prizm.Color.Transform
     Data.Prizm.Color.SRGB
     Data.Prizm.Color.CIE
+    Data.Prizm.Color.Matrices.RGB
+    Data.Prizm.Color.Matrices.XYZ
   
   ghc-options: -Wall
   

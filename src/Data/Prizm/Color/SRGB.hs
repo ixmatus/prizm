@@ -1,18 +1,14 @@
 module Data.Prizm.Color.SRGB
 (
   toXYZ
+, toXYZMatrix
 ) where
 
 import Data.Prizm.Types
 import Data.Prizm.Color.Transform
+import Data.Prizm.Color.Matrices.RGB
 
 import Control.Applicative
-
-matrix :: [[Double]]
-matrix = [
-  [0.4124564, 0.3575761, 0.1804375],
-  [0.2126729, 0.7151522, 0.0721750],
-  [0.0193339, 0.1191920, 0.9503041]]
 
 -- | @rgbTransform@ transform an RGB integer to be computed against
 -- the rgbToXYZ matrix.
@@ -24,7 +20,10 @@ transform v | dv > 0.04045 = (((dv + 0.055) / ap) ** 2.4) * 100
 
 -- | @toXYZ@ convert an sRGB value to a CIE XYZ value.
 toXYZ :: SRGB -> CIE
-toXYZ (SRGB r g b) =
+toXYZ = (toXYZMatrix d65SRGB)
+
+toXYZMatrix :: RGBtoXYZ -> SRGB -> CIE
+toXYZMatrix m (SRGB r g b) =
     let t = ZipList (transform <$> [r,g,b])
-        [x,y,z] = (zipTransform t) <$> matrix
+        [x,y,z] = (zipTransform t) <$> m
     in XYZ x y z

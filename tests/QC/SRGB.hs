@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module QC.SRGB (tests) where
 
 import Test.Framework.Providers.QuickCheck2 (testProperty)

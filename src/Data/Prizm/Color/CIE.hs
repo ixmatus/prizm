@@ -1,18 +1,15 @@
 module Data.Prizm.Color.CIE
 (
   toRGB
+, toRGBMatrix
 ) where
+
+import Control.Applicative
 
 import Data.Prizm.Types
 import Data.Prizm.Color.Transform
 
-import Control.Applicative
-
-matrix :: [[Double]]
-matrix = [
-  [3.2404542, (-1.5371385), (-0.4985314)],
-  [(-0.9692660), 1.8760108, 0.0415560],
-  [0.0556434, (-0.2040259), 1.0572252]]
+import Data.Prizm.Color.Matrices.XYZ
 
 -- | @transform@ transform an XYZ integer to be computed against
 -- the xyzToRGB matrix.
@@ -27,7 +24,10 @@ transform v | v > 0.0031308 = min (round ((1.055 * (v ** (1 / 2.4)) - 0.055) * 2
 -- color -> SRGB conversion.
 toRGB :: CIE -> SRGB
 --toRGB (LAB _ _ _) = Nothing
-toRGB (XYZ x y z) =
+toRGB = (toRGBMatrix d65SRGB)
+
+toRGBMatrix :: XYZtoRGB -> CIE -> SRGB
+toRGBMatrix m (XYZ x y z) =
     let t = ZipList ((/100) <$> [x,y,z])
-        [r,g,b] = (transform) <$> ((zipTransform t) <$> matrix)
+        [r,g,b] = (transform) <$> ((zipTransform t) <$> m)
     in SRGB r g b
