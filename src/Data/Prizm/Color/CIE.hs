@@ -52,9 +52,9 @@ toLAB (LAB l a b) = LAB l a b
 toLAB (XYZ x y z) =
     let v = getZipList $ ZipList ((/) <$> [x,y,z]) <*> ZipList refWhite
         [tx,ty,tz] = (transformLAB) <$> v
-        l = (116 * ty) - 16
-        a = 500 * (tx - ty)
-        b = 200 * (ty - tz)
+        l = roundN 3 $ (116 * ty) - 16
+        a = roundN 3 $ 500 * (tx - ty)
+        b = roundN 3 $ 200 * (ty - tz)
     in LAB l a b
 
 toXYZ :: CIE -> CIE
@@ -63,6 +63,7 @@ toXYZ (LAB l a b) =
     let y = (l + 16) / 116
         x = a / 500 + y
         z = y - b / 200
-        [nx,ny,nz] = getZipList $ ((*) <$> ZipList ((transformXYZ) <$> [x,y,z])) <*> ZipList refWhite
+        -- precision upto three decimal places
+        [nx,ny,nz] = (roundN 3) <$> (getZipList $ ((*) <$> ZipList ((transformXYZ) <$> [x,y,z])) <*> ZipList refWhite)
     in XYZ nx ny nz
     
