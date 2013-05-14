@@ -31,5 +31,6 @@ Implementations for
 - hue
 - saturation
 - inversion
-
+[General Color Formulas, Data, and Algorithms](http://www.brucelindbloom.com/index.html?Info.html)
+[CIE Conversion Mathematics](http://rip94550.wordpress.com/2011/07/04/color-cielab-and-tristimulus-xyz/)
 [Conversion Algorithm Sources](http://www.easyrgb.com/index.php?X=MATH&H=01)
