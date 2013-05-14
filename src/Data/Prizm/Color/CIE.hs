@@ -17,6 +17,14 @@ import Data.Prizm.Color.Matrices.XYZ
 refWhite :: [Double]
 refWhite = [95.047, 100.000, 108.883]
 
+-- | exact rational of the "0.008856" value.
+v1 :: Double
+v1 = (6/29) ** 3
+
+-- | exact rational of the "7.787" value.
+v2 :: Double
+v2 = 1/3 * ((29/6) ** 2)
+
 -- | @transformRGB@ transform an XYZ integer to be computed against
 -- the xyzToRGB matrix.
 transformRGB :: Double -> Integer
@@ -24,12 +32,12 @@ transformRGB v | v > 0.0031308 = min (round ((1.055 * (v ** (1 / 2.4)) - 0.055) 
                | otherwise     = min (round ((12.92 * v) * 255)) 255
 
 transformLAB :: Double -> Double
-transformLAB v | v > 0.008856 = v ** (1/3)
-               | otherwise    = (7.787 * v) + (16 / 116)
+transformLAB v | v > v1 = v ** (1/3)
+               | otherwise    = (v2 * v) + (16 / 116)
 
 transformXYZ :: Double -> Double
-transformXYZ v | cv > 0.008856 = cv
-               | otherwise = (v - 16 / 116) / 7.787
+transformXYZ v | cv > v1 = cv
+               | otherwise     = (v - 16 / 116) / v2
     where cv = v**3
 
 -- | @toRGB@ convert a CIE color to an SRGB color.
@@ -52,9 +60,9 @@ toLAB (LAB l a b) = LAB l a b
 toLAB (XYZ x y z) =
     let v = getZipList $ ZipList ((/) <$> [x,y,z]) <*> ZipList refWhite
         [tx,ty,tz] = (transformLAB) <$> v
-        l = roundN 3 $ (116 * ty) - 16
-        a = roundN 3 $ 500 * (tx - ty)
-        b = roundN 3 $ 200 * (ty - tz)
+        l = (116 * ty) - 16
+        a = 500 * (tx - ty)
+        b = 200 * (ty - tz)
     in LAB l a b
 
 toXYZ :: CIE -> CIE
@@ -64,6 +72,6 @@ toXYZ (LAB l a b) =
         x = a / 500 + y
         z = y - b / 200
         -- precision upto three decimal places
-        [nx,ny,nz] = (roundN 3) <$> (getZipList $ ((*) <$> ZipList ((transformXYZ) <$> [x,y,z])) <*> ZipList refWhite)
+        [nx,ny,nz] = getZipList $ ((*) <$> ZipList ((transformXYZ) <$> [x,y,z])) <*> ZipList refWhite
     in XYZ nx ny nz
     

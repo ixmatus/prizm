@@ -10,7 +10,7 @@ import Data.Prizm.Types
 
 instance Arbitrary CIE where
     arbitrary = oneof [(liftM3 XYZ (choose (0, 95.047)) (choose (0, 100.000)) (choose (0, 108.883))),
-                       (liftM3 LAB (choose (0, 100)) (choose ((-128), 127)) (choose ((-128), 127)))]
+                       (liftM3 LAB (choose (0, 100)) (choose ((-129), 129)) (choose ((-129), 129)))]
 
 xyz2LAB :: CIE -> Bool
 xyz2LAB v = C.toLAB(C.toXYZ v) == v
