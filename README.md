@@ -10,22 +10,22 @@ use in stylesheets and I wanted the same thing for use in [Clay](http://fvisser.
 ## Colour Module
 
 There is some overlap with the Haskell Colour Module that already exists; however, this library is filling a couple of
-needs the other doesn't satisfy. I also want to have a cleaner API to work with.
+needs the other doesn't satisfy.
 
 ## Supported Algorithms
 
-- sRGB -> CIE XYZ
-- CIE XYZ -> sRGB
+- sRGB <-> CIE XYZ
+- CIE XYZ <-> CIE L\*a\*b\*
 
 ## Roadmap
 
 ### 0.1.0.2
 Make sure all of the conversion formulas convert losslessly at an acceptable level of precision.
 
-### 1.0.0.0
-Implementation of conversions for all the CIE color representations and a converter for HEX to SRGB (trivial).
+### 0.1.0.3
+Conversion for SRGB <-> HEX. All color types should be instances of Functor so fmap can work over their values.
 
-### 1.1.0.0
+### 1.0.0.0
 Implementations for
 
 - color mixing
