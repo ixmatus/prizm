@@ -23,7 +23,11 @@ needs the other doesn't satisfy.
 Make sure all of the conversion formulas convert losslessly at an acceptable level of precision.
 
 ### 0.1.0.3
-Conversion for SRGB <-> HEX. All color types should be instances of Functor so fmap can work over their values.
+All color types should have instances for Functor so fmap can work over their values.
+All color types should have instances for Applicative to make computations cleaner.
+
+### 0.1.0.4
+Conversion functions for sRGB to HEX.
 
 ### 1.0.0.0
 Implementations for
