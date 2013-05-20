@@ -1,3 +1,11 @@
+0.1.0.3
+=======
+
+- Re-defined the CIE types so they are their own separate types
+  instead of branch types.
+- Implemented instances of Functor and Applicative for all color
+  types.
+
 0.1.0.2
 =======
 
