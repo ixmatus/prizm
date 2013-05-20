@@ -19,11 +19,11 @@ transform v | dv > 0.04045 = (((dv + 0.055) / ap) ** 2.4) * 100
           ap = 1.0 + 0.055
 
 -- | @toXYZ@ convert an sRGB value to a CIE XYZ value.
-toXYZ :: RGB -> CIE
+toXYZ :: RGB Integer -> CIEXYZ Double
 toXYZ = (toXYZMatrix d65SRGB)
 
-toXYZMatrix :: RGBtoXYZ -> RGB -> CIE
+toXYZMatrix :: RGBtoXYZ -> RGB Integer -> CIEXYZ Double
 toXYZMatrix m (RGB r g b) =
     let t = ZipList (transform <$> [r,g,b])
         [x,y,z] = (roundN 3) <$> ((zipTransform t) <$> m)
-    in XYZ x y z
+    in CIEXYZ x y z

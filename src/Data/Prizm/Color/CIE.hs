@@ -45,32 +45,29 @@ transformXYZ v | cv > v1 = cv
 -- Once I've implemented CIE L*a*b -> XYZ and vice-versa functions
 -- then I'll introduce the type exhaustively here to handle any CIE
 -- color -> SRGB conversion.
-toRGB :: CIE -> RGB
+toRGB :: CIEXYZ Double -> RGB Integer
 toRGB = (toRGBMatrix d65SRGB)
 
-toRGBMatrix :: XYZtoRGB -> CIE -> RGB
-toRGBMatrix m (LAB l a b) = toRGBMatrix m (toXYZ (LAB l a b))
-toRGBMatrix m (XYZ x y z) =
+toRGBMatrix :: XYZtoRGB -> CIEXYZ Double -> RGB Integer
+toRGBMatrix m (CIEXYZ x y z) =
     let t = ZipList ((/100) <$> [x,y,z])
         [r,g,b] = (transformRGB) <$> ((zipTransform t) <$> m)
     in RGB r g b
 
-toLAB :: CIE -> CIE
-toLAB (LAB l a b) = LAB l a b
-toLAB (XYZ x y z) =
+toLAB :: CIEXYZ Double -> CIELAB Double
+toLAB (CIEXYZ x y z) =
     let v = getZipList $ ZipList ((/) <$> [x,y,z]) <*> ZipList refWhite
         [tx,ty,tz] = (transformLAB) <$> v
         l = (116 * ty) - 16
         a = 500 * (tx - ty)
         b = 200 * (ty - tz)
-    in LAB l a b
+    in CIELAB l a b
 
-toXYZ :: CIE -> CIE
-toXYZ (XYZ x y z) = XYZ x y z
-toXYZ (LAB l a b) =
+toXYZ :: CIELAB Double -> CIEXYZ Double
+toXYZ (CIELAB l a b) =
     let y = (l + 16) / 116
         x = a / 500 + y
         z = y - b / 200
         [nx,ny,nz] = getZipList $ ((*) <$> ZipList ((transformXYZ) <$> [x,y,z])) <*> ZipList refWhite
-    in XYZ nx ny nz
+    in CIEXYZ nx ny nz
     

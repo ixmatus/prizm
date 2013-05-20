@@ -1,17 +1,22 @@
+{-# LANGUAGE FlexibleInstances #-}
+
 module QC.CIE (tests) where
 
 import Test.Framework.Providers.QuickCheck2 (testProperty)
 import Test.QuickCheck
 
 import Control.Monad
+import Control.Applicative
 
 import Data.Prizm.Color.CIE as C
 import Data.Prizm.Color.Transform
 import Data.Prizm.Types
 
-instance Arbitrary CIE where
-    arbitrary = oneof [(liftM3 XYZ (choose (0, 95.047)) (choose (0, 100.000)) (choose (0, 108.883))),
-                       (liftM3 LAB (choose (0, 100)) (choose ((-129), 129)) (choose ((-129), 129)))]
+instance Arbitrary (CIEXYZ Double) where
+    arbitrary = liftM3 CIEXYZ (choose (0, 95.047)) (choose (0, 100.000)) (choose (0, 108.883))
+
+instance Arbitrary (CIELAB Double) where
+    arbitrary = liftM3 CIELAB (choose (0, 100)) (choose ((-129), 129)) (choose ((-129), 129))
 
 tN = truncateN 11
 rN = roundN 11
@@ -21,25 +26,17 @@ rN = roundN 11
 -- 
 -- This QuickCheck test guarantees a lossless conversion between CIE
 -- XYZ and CIE L*a*b* at a precision of 11 decimal places.
-xyz2LAB :: CIE -> Bool
-xyz2LAB (XYZ x y z) =
-    let nx = tN x
-        ny = tN y
-        nz = tN z
-        nv = (XYZ nx ny nz)
-        (XYZ x1 y1 z1) = C.toXYZ(C.toLAB(nv))
-    in (XYZ (rN x1) (rN y1) (rN z1)) == nv
-xyz2LAB (LAB l a b) =
-    let nl = tN l
-        na = tN a
-        nb = tN b
-        nv = (LAB nl na nb)
-        (LAB l1 a1 b1) = C.toLAB(C.toXYZ nv)
-    in (LAB (rN l1) (rN a1) (rN b1)) == nv
+xyz2LAB :: CIEXYZ Double -> Bool
+xyz2LAB v =
+    let nv = tN <$> v
+    in (rN <$> C.toXYZ(C.toLAB nv)) == nv
 
-conversion :: CIE -> CIE
-conversion v = C.toLAB(C.toXYZ v)
+lab2XYZ :: CIELAB Double -> Bool
+lab2XYZ v =
+    let nv = tN <$> v
+    in (rN <$> C.toLAB(C.toXYZ nv)) == nv
 
 tests = [
-    testProperty "CIE XYZ <-> CIE L*a*b*" xyz2LAB
+    testProperty "CIE XYZ <-> CIE L*a*b*" xyz2LAB,
+    testProperty "CIE L*a*b* <-> CIE XYZ" lab2XYZ
       ]
