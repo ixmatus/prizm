@@ -1,5 +1,5 @@
 Name:                prizm
-Version:             0.1.0.1
+Version:             0.1.0.2
 Synopsis:            A haskell library for computing with colors
 
 Description:         Prizm can convert between many different color

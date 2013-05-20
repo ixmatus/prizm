@@ -1,0 +1,23 @@
+0.1.0.2
+=======
+
+- CIE XYZ to CIE L*a*b* formula implemented.
+- CIE L*a*b* to CIE XYZ formula implemented.
+- Implemented better fractional values in the formulas gleaned from
+  this website: [CIE Conversion Mathematics](http://rip94550.wordpress.com/2011/07/04/color-cielab-and-tristimulus-xyz/).
+- Comprehensive QuickCheck tests finished and pass with a lossless
+  conversion at 11 decimal places.
+
+0.1.0.1
+=======
+
+- SRGB to CIE XYZ formula implemented.
+- CIE XYZ to SRGB formula implemented.
+- Comprehensive QuickCheck tests finished and pass (conversion is lossless).
+
+0.1.0.0
+=======
+
+- Package set up, types figured out.
+- Research on different color representations, illuminants,
+  chromaticity, etc...
