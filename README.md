@@ -19,10 +19,13 @@ needs the other doesn't satisfy. I also want to have a cleaner API to work with.
 
 ## Roadmap
 
-### 1.0.0
+### 0.1.0.1
+Make sure all of the conversion formulas convert losslessly at an acceptable level of precision.
+
+### 1.0.0.0
 Implementation of conversions for all the CIE color representations and a converter for HEX to SRGB (trivial).
 
-### 1.1.0
+### 1.1.0.0
 Implementations for
 
 - color mixing

@@ -71,7 +71,6 @@ toXYZ (LAB l a b) =
     let y = (l + 16) / 116
         x = a / 500 + y
         z = y - b / 200
-        -- precision upto three decimal places
         [nx,ny,nz] = getZipList $ ((*) <$> ZipList ((transformXYZ) <$> [x,y,z])) <*> ZipList refWhite
     in XYZ nx ny nz
     

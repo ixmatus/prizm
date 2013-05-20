@@ -24,6 +24,7 @@ Cabal-version:       >=1.14.0
 extra-source-files:
     LICENSE
     README.md
+    CHANGES
 
 source-repository head
   type:     git

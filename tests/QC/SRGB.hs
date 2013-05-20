@@ -15,5 +15,5 @@ instance Arbitrary RGB where
 rgb2XYZ v = C.toRGB(S.toXYZ v) == v
 
 tests = [
-    testProperty "toXYZ" rgb2XYZ
+    testProperty "SRGB <-> CIE XYZ" rgb2XYZ
       ]
