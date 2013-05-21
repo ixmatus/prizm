@@ -35,6 +35,7 @@ library
   default-language: Haskell2010
   exposed-modules:
     Data.Prizm.Types
+    Data.Prizm.Color
     Data.Prizm.Color.Transform
     Data.Prizm.Color.SRGB
     Data.Prizm.Color.CIE
