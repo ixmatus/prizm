@@ -29,15 +29,13 @@ All color types should have instances for Applicative to make computations clean
 ### 0.1.0.4
 Conversion functions for sRGB to HEX.
 
-### 1.0.0.0
-Implementations for
+### 0.2.0.0
+Functions for
 
-- color mixing
+- color blending
 - tint / shade
 - darken / lighten
-- hue
-- saturation
-- inversion
+
 [General Color Formulas, Data, and Algorithms](http://www.brucelindbloom.com/index.html?Info.html)
 [CIE Conversion Mathematics](http://rip94550.wordpress.com/2011/07/04/color-cielab-and-tristimulus-xyz/)
 [Conversion Algorithm Sources](http://www.easyrgb.com/index.php?X=MATH&H=01)
