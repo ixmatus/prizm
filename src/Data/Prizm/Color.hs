@@ -1,27 +1,21 @@
--- module Data.Prizm.Color where
+module Data.Prizm.Color where
 
--- pct :: Integer -> Double
--- pct = (/100) . fromIntegral . (max 0) . (min 100)
+import Control.Applicative
+import Data.Prizm.Types
 
--- reduceByPct :: Integer -> Integer -> Integer
--- reduceByPct v pc = clamp $ floor (fromIntegral v - (fromIntegral v * (pct pc)))
+pct :: Integer -> Percent
+pct = (/100) . fromIntegral . (max 0) . (min 100)
 
--- increaseByPct :: Integer -> Integer -> Integer
--- increaseByPct v pc = clamp $ floor (fromIntegral v + (fromIntegral v * (pct pc)))
+blend :: (CIEXYZ Double, CIEXYZ Double) -> CIEXYZ Double
+blend = blendWeighted (pct 50)
 
--- -- | @darken@ darkens a given color by a percentage.
--- -- 
--- -- The darken algorithm needs to darken all three colors if they are the same
--- darken :: Color -> Integer -> Color
--- darken (Rgba r g b a) i = Rgba (reduceByPct (fromIntegral r) i) (reduceByPct (fromIntegral g) i) (reduceByPct (fromIntegral b) i) a
--- darken (Hsla r g b a) i = Hsla (reduceByPct (fromIntegral r) i) (reduceByPct (fromIntegral g) i) (reduceByPct (fromIntegral b) i) a
--- darken (Other o)      _ = Other o
-
--- -- | @lighten@ lightens a given color by a percentage.
--- lighten :: Color -> Integer -> Color
--- lighten (Rgba r g b a) i = Rgba (increaseByPct (fromIntegral r) i) (increaseByPct (fromIntegral g) i) (increaseByPct (fromIntegral b) i) a
--- lighten (Hsla r g b a) i = Hsla (increaseByPct (fromIntegral r) i) (increaseByPct (fromIntegral g) i) (increaseByPct (fromIntegral b) i) a
--- lighten (Other o)      _ = Other o
-
--- -- (<.) shade
--- -- (.>) tint
+-- | Blend using a weighted average for two XYZ colors.
+-- 
+-- Weight are applied left to right, so if a weight of 25% is
+-- supplied, then the color on the left will be multiplied by 25% and
+-- the second color will be multiplied by 75%.
+blendWeighted :: Percent -> (CIEXYZ Double, CIEXYZ Double) -> CIEXYZ Double
+blendWeighted w (a,b) =
+    let a1 = (*w) <$> a
+        b1 = (*(1.0 - w)) <$> b
+    in (+) <$> a1 <*> b1
