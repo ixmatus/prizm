@@ -22,12 +22,18 @@ shade c w = blendWeighted (pctClamp w) (CIEXYZ 0.0 0.0 0.0, c)
 tint :: CIEXYZ Double -> Percent -> CIEXYZ Double
 tint c w = blendWeighted (pctClamp w) ((CIEXYZ 95.047 100.0 108.883), c)
 
+-- | Darken a color by converting it to CIE L*a*b* first, multiplying
+-- it by the weight, and then subtracting that value from the original
+-- L* value and converting the whole back to XYZ.
 darken :: CIEXYZ Double -> Percent -> CIEXYZ Double
 darken c w =
     let (CIELAB l a b) = C.toLAB c
         l' = l - (l*(pct (pctClamp w)))
     in C.toXYZ (CIELAB l' a b)
 
+-- | Lighten a color by converting it to CIE L*a*b* first, multiplying
+-- it by the weight, and then adding that value to the original L*
+-- value and converting the whole back to XYZ.
 lighten :: CIEXYZ Double -> Percent -> CIEXYZ Double
 lighten c w =
     let (CIELAB l a b) = C.toLAB c
