@@ -5,6 +5,8 @@ import Control.Applicative
 type RGBtoXYZ = [[Double]]
 type XYZtoRGB = [[Double]]
 
+type Hex = String
+
 data RGB a = RGB !a !a !a
     deriving (Eq, Ord, Show)
 
