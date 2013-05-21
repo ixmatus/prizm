@@ -1,3 +1,9 @@
+0.2.0.0
+=======
+
+- Adding in Weighted Blending, Darkening, Lightening, Shading, and
+  Tinting functions.
+
 0.1.0.4
 =======
 
