@@ -9,6 +9,7 @@ module Data.Prizm.Color.CIE
 import Control.Applicative
 
 import Data.Prizm.Types
+import Data.Prizm.Color.SRGB            (clamp)
 import Data.Prizm.Color.Transform
 import Data.Prizm.Color.Matrices.XYZ
 
@@ -52,7 +53,7 @@ toRGBMatrix :: XYZtoRGB -> CIEXYZ Double -> RGB Integer
 toRGBMatrix m (CIEXYZ x y z) =
     let t = ZipList ((/100) <$> [x,y,z])
         [r,g,b] = (transformRGB) <$> ((zipTransform t) <$> m)
-    in RGB r g b
+    in (clamp) <$> RGB r g b
 
 toLAB :: CIEXYZ Double -> CIELAB Double
 toLAB (CIEXYZ x y z) =

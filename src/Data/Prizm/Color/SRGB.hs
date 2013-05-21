@@ -4,6 +4,7 @@ module Data.Prizm.Color.SRGB
 , toXYZMatrix
 , toHex
 , fromHex
+, clamp
 ) where
 
 import Numeric (showHex)

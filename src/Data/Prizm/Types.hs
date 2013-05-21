@@ -7,6 +7,8 @@ type XYZtoRGB = [[Double]]
 
 type Hex = String
 
+type Percent = Integer
+
 data RGB a = RGB !a !a !a
     deriving (Eq, Ord, Show)
 
