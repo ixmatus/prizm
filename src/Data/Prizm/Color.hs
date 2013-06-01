@@ -50,8 +50,8 @@ lighten c w =
 -- 
 -- CIE L*Ch is used because the interpolation between the colors is
 -- more accurate than L*ab, XYZ, and sRGB color spaces.
-blendWeighted :: Percent -> (CIELCH Double, CIELCH Double) -> CIELCH Double
-blendWeighted w ((CIELCH l c h),(CIELCH l' c' h')) =
+blendWeighted' :: Percent -> (CIELCH Double, CIELCH Double) -> CIELCH Double
+blendWeighted' w ((CIELCH l c h),(CIELCH l' c' h')) =
     let w'  = (pct (pctClamp w))
         w'' = 1.0 - w'
         nl  = clamp ((l*w') + (l'*w'')) 100
@@ -64,8 +64,8 @@ shortestPath h | h > 180    = h - 360
                | h < (-180) = h + 360
                | otherwise  = h
 
-blendWeighted' :: Percent -> (CIELCH Double, CIELCH Double) -> CIELCH Double
-blendWeighted' w ((CIELCH l c h),(CIELCH l' c' h')) =
+blendWeighted :: Percent -> (CIELCH Double, CIELCH Double) -> CIELCH Double
+blendWeighted w ((CIELCH l c h),(CIELCH l' c' h')) =
     let w'  = (pct (pctClamp w))
         nl  = if l > l' then l - l' else l' - l
         nc  = c - c'

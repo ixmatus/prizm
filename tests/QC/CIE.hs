@@ -16,7 +16,7 @@ instance Arbitrary (CIEXYZ Double) where
     arbitrary = liftM3 CIEXYZ (choose (0, 95.047)) (choose (0, 100.000)) (choose (0, 108.883))
 
 instance Arbitrary (CIELAB Double) where
-    arbitrary = liftM3 CIELAB (choose (0, 100)) (choose ((-127), 127)) (choose ((-127), 127))
+    arbitrary = liftM3 CIELAB (choose (0, 100)) (choose ((-129), 129)) (choose ((-129), 129))
 
 tN = truncateN 11
 rN = roundN 11
