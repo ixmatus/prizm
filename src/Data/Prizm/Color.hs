@@ -1,6 +1,5 @@
 module Data.Prizm.Color where
 
-import Control.Applicative
 import Data.Prizm.Types
 import Data.Prizm.Color.CIE as C
 
@@ -59,3 +58,17 @@ blendWeighted w ((CIELCH l c h),(CIELCH l' c' h')) =
         nc  = (c*w') + (c'*w'')
         nh  = (h*w') + (h'*w'')
     in CIELCH nl nc nh
+
+shortestPath :: Double -> Double
+shortestPath h | h > 180    = h - 360
+               | h < (-180) = h + 360
+               | otherwise  = h
+
+blendWeighted' :: Percent -> (CIELCH Double, CIELCH Double) -> CIELCH Double
+blendWeighted' w ((CIELCH l c h),(CIELCH l' c' h')) =
+    let w'  = (pct (pctClamp w))
+        nl  = if l > l' then l - l' else l' - l
+        nc  = c - c'
+        nh  = h - h'
+        zh  = shortestPath nh
+    in CIELCH (clamp (l + nl * w') 100) (c + nc * w') (clamp (h + zh * w') 360)
