@@ -41,8 +41,8 @@ transformLAB v | v > v1    = v ** (1/3)
                | otherwise = (v2 * v) + (16 / 116)
 
 transformLCH :: Double -> Double
-transformLCH v | v > 0      = (v / (22/7)) * 180
-               | otherwise  = 360 - ((abs v) / 22/7) * 180
+transformLCH v | v > 0      = (v / pi) * 180
+               | otherwise  = 360 - ((abs v) / pi) * 180
 
 transformXYZ :: Double -> Double
 transformXYZ v | cv > v1   = cv
@@ -80,7 +80,7 @@ toLCH (CIELAB l a b) =
 
 lchToLAB :: CIELCH Double -> CIELAB Double
 lchToLAB (CIELCH l c h) =
-    let Radians v = radians (Degrees h)
+    let v = h * pi / 180
     in CIELAB l ((cos v)*c) ((sin v)*c)
 
 toXYZ :: CIELAB Double -> CIEXYZ Double
