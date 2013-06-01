@@ -2,8 +2,8 @@ module Data.Prizm.Types where
 
 import Control.Applicative
 
-type RGBtoXYZ = [[Double]]
-type XYZtoRGB = [[Double]]
+newtype RGBtoXYZ = RGBtoXYZ [[Double]] deriving (Eq, Ord, Show)
+newtype XYZtoRGB = XYZtoRGB [[Double]] deriving (Eq, Ord, Show)
 
 type Hex = String
 
@@ -18,6 +18,9 @@ data CIEXYZ a = CIEXYZ !a !a !a
 data CIELAB a = CIELAB !a !a !a
     deriving (Eq, Ord, Show)
 
+data CIELCH a = CIELCH !a !a !a
+    deriving (Eq, Ord, Show)
+
 -- | Functor instances
 instance Functor RGB where
     fmap f (RGB r g b) = (RGB (f r) (f g) (f b))
@@ -27,6 +30,9 @@ instance Functor CIEXYZ where
 
 instance Functor CIELAB where
     fmap f (CIELAB l a b) = (CIELAB (f l) (f a) (f b))
+
+instance Functor CIELCH where
+    fmap f (CIELCH l c h) = (CIELCH (f l) (f c) (f h))
 
 -- | Applicative instances
 
@@ -41,3 +47,7 @@ instance Applicative CIEXYZ where
 instance Applicative CIELAB where
     pure t = CIELAB t t t
     CIELAB f1 f2 f3 <*> CIELAB l a b = CIELAB (f1 l) (f2 a) (f3 b)
+
+instance Applicative CIELCH where
+    pure t = CIELCH t t t
+    CIELCH f1 f2 f3 <*> CIELCH l c h = CIELCH (f1 l) (f2 c) (f3 h)

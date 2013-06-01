@@ -57,7 +57,7 @@ toXYZ :: RGB Integer -> CIEXYZ Double
 toXYZ = (toXYZMatrix d65SRGB)
 
 toXYZMatrix :: RGBtoXYZ -> RGB Integer -> CIEXYZ Double
-toXYZMatrix m (RGB r g b) =
+toXYZMatrix (RGBtoXYZ m) (RGB r g b) =
     let t = ZipList (transform <$> (clamp <$> [r,g,b]))
         [x,y,z] = (roundN 3) <$> ((zipTransform t) <$> m)
     in CIEXYZ x y z

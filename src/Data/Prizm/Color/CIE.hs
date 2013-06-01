@@ -4,9 +4,13 @@ module Data.Prizm.Color.CIE
 , toRGBMatrix
 , toLAB
 , toXYZ
+, toLCH
+, lchToLAB
 ) where
 
 import Control.Applicative
+
+import Data.Angle
 
 import Data.Prizm.Types
 import Data.Prizm.Color.SRGB            (clamp)
@@ -33,12 +37,16 @@ transformRGB v | v > 0.0031308 = min (round ((1.055 * (v ** (1 / 2.4)) - 0.055) 
                | otherwise     = min (round ((12.92 * v) * 255)) 255
 
 transformLAB :: Double -> Double
-transformLAB v | v > v1 = v ** (1/3)
-               | otherwise    = (v2 * v) + (16 / 116)
+transformLAB v | v > v1    = v ** (1/3)
+               | otherwise = (v2 * v) + (16 / 116)
+
+transformLCH :: Double -> Double
+transformLCH v | v > 0      = (v / (22/7)) * 180
+               | otherwise  = 360 - ((abs v) / 22/7) * 180
 
 transformXYZ :: Double -> Double
-transformXYZ v | cv > v1 = cv
-               | otherwise     = (v - 16 / 116) / v2
+transformXYZ v | cv > v1   = cv
+               | otherwise = (v - 16 / 116) / v2
     where cv = v**3
 
 -- | @toRGB@ convert a CIE color to an SRGB color.
@@ -50,7 +58,7 @@ toRGB :: CIEXYZ Double -> RGB Integer
 toRGB = (toRGBMatrix d65SRGB)
 
 toRGBMatrix :: XYZtoRGB -> CIEXYZ Double -> RGB Integer
-toRGBMatrix m (CIEXYZ x y z) =
+toRGBMatrix (XYZtoRGB m) (CIEXYZ x y z) =
     let t = ZipList ((/100) <$> [x,y,z])
         [r,g,b] = (transformRGB) <$> ((zipTransform t) <$> m)
     in (clamp) <$> RGB r g b
@@ -64,6 +72,17 @@ toLAB (CIEXYZ x y z) =
         b = 200 * (ty - tz)
     in CIELAB l a b
 
+toLCH :: CIELAB Double -> CIELCH Double
+toLCH (CIELAB l a b) =
+    let h = transformLCH (atan2 b a)
+        c = sqrt ((a^2) + (b^2))
+    in CIELCH l c h
+
+lchToLAB :: CIELCH Double -> CIELAB Double
+lchToLAB (CIELCH l c h) =
+    let Radians v = radians (Degrees h)
+    in CIELAB l ((cos v)*c) ((sin v)*c)
+
 toXYZ :: CIELAB Double -> CIEXYZ Double
 toXYZ (CIELAB l a b) =
     let y = (l + 16) / 116
@@ -71,4 +90,3 @@ toXYZ (CIELAB l a b) =
         z = y - b / 200
         [nx,ny,nz] = getZipList $ ((*) <$> ZipList ((transformXYZ) <$> [x,y,z])) <*> ZipList refWhite
     in CIEXYZ nx ny nz
-    

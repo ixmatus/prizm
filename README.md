@@ -12,10 +12,15 @@ use in stylesheets and I wanted the same thing for use in [Clay](http://fvisser.
 There is some overlap with the Haskell Colour Module that already exists; however, this library is filling a couple of
 needs the other doesn't satisfy.
 
+## TODO
+
+This module is getting kind of messy, I want to refactor how everything is organized. I also need to fix the types.
+
 ## Supported Algorithms
 
 - sRGB <-> CIE XYZ
 - CIE XYZ <-> CIE L\*a\*b\*
+- CIE L\*\a\*b <-> CIE L\*C\*h
 
 ## Roadmap
 
@@ -36,6 +41,11 @@ Functions for
 - tint / shade
 - darken / lighten
 
+### 0.2.1.0
+
+Blending is now switched over to using CIE L*Ch color space for more accurate blending.
+
 [General Color Formulas, Data, and Algorithms](http://www.brucelindbloom.com/index.html?Info.html)
 [CIE Conversion Mathematics](http://rip94550.wordpress.com/2011/07/04/color-cielab-and-tristimulus-xyz/)
 [Conversion Algorithm Sources](http://www.easyrgb.com/index.php?X=MATH&H=01)
+[Good list of useful color manipulation](https://github.com/mikeemoo/ColorJizz-PHP/blob/master/src/MischiefCollective/ColorJizz/ColorJizz.php)

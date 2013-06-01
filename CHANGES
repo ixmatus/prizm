@@ -1,6 +1,12 @@
 0.2.0.0
 =======
 
+- Adding conversion functions for CIE L*ab and CIE L*Ch.
+- Blending is now done in the CIE L*Ch color space.
+
+0.2.0.0
+=======
+
 - Adding in Weighted Blending, Darkening, Lightening, Shading, and
   Tinting functions.
 

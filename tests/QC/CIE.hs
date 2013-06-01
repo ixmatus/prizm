@@ -36,7 +36,13 @@ lab2XYZ v =
     let nv = tN <$> v
     in (rN <$> C.toLAB(C.toXYZ nv)) == nv
 
+lab2LCH :: CIELAB Double -> Bool
+lab2LCH v =
+    let nv = tN <$> v
+    in (rN <$> C.lchToLAB(C.toLCH nv)) == nv
+
 tests = [
     testProperty "CIE XYZ <-> CIE L*a*b*" xyz2LAB,
-    testProperty "CIE L*a*b* <-> CIE XYZ" lab2XYZ
+    testProperty "CIE L*ab <-> CIE XYZ" lab2XYZ,
+    testProperty "CIE L*ab <-> CIE L*Ch" lab2LCH
       ]
