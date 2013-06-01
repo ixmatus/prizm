@@ -61,6 +61,6 @@ test-suite tests
   build-depends:
     prizm,
     base >= 4,
-    QuickCheck >= 2.6,
+    QuickCheck >= 2.5,
     test-framework >= 0.8,
     test-framework-quickcheck2 >= 0.3.0
