@@ -1,5 +1,5 @@
 Name:                prizm
-Version:             0.2.0.0
+Version:             0.2.1.0
 Synopsis:            A haskell library for computing with colors
 
 Description:         Prizm can convert between many different color
@@ -61,6 +61,6 @@ test-suite tests
   build-depends:
     prizm,
     base >= 4,
-    QuickCheck >= 2.4,
-    test-framework >= 0.4,
-    test-framework-quickcheck2 >= 0.2
+    QuickCheck >= 2.6,
+    test-framework >= 0.8,
+    test-framework-quickcheck2 >= 0.3.0
