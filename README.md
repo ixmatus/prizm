@@ -24,15 +24,17 @@ This module is getting kind of messy, I want to refactor how everything is organ
 
 ## Roadmap
 
-### 0.1.0.2
-Make sure all of the conversion formulas convert losslessly at an acceptable level of precision.
+### 0.3.0.0
 
-### 0.1.0.3
-All color types should have instances for Functor so fmap can work over their values.
-All color types should have instances for Applicative to make computations cleaner.
+I really want to clean up the API - right now stuff is just "everywhere" and the different color spaces should have
+their own modules with their own convenience conversions to/from RGB to minimize the amount of function chaining
+required.
 
-### 0.1.0.4
-Conversion functions for sRGB to HEX.
+I also want to figure out a way of testing the lighten/darken, interpolation, and hue transformation functions.
+
+### 0.2.1.0
+
+Blending is now switched over to using CIE L*Ch color space for more accurate blending.
 
 ### 0.2.0.0
 Functions for
@@ -41,9 +43,15 @@ Functions for
 - tint / shade
 - darken / lighten
 
-### 0.2.1.0
+### 0.1.0.4
+Conversion functions for sRGB to HEX.
 
-Blending is now switched over to using CIE L*Ch color space for more accurate blending.
+### 0.1.0.3
+All color types should have instances for Functor so fmap can work over their values.
+All color types should have instances for Applicative to make computations cleaner.
+
+### 0.1.0.2
+Make sure all of the conversion formulas convert losslessly at an acceptable level of precision.
 
 [General Color Formulas, Data, and Algorithms](http://www.brucelindbloom.com/index.html?Info.html)
 [CIE Conversion Mathematics](http://rip94550.wordpress.com/2011/07/04/color-cielab-and-tristimulus-xyz/)
