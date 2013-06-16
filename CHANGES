@@ -1,3 +1,14 @@
+0.3.0.0
+=======
+
+- Separated the CIE representations out into their own modules so that
+  I could implement their own convenience functions to go to/from all
+  of the other different representations without arduous function
+  chaining. Particularly for HEX/RGB -> LCH (involves around 5
+  function calls!).
+- Removed the Angle package.
+- Fixed the tests to accomodate the API changes.
+
 0.2.1.0
 =======
 

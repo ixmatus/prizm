@@ -8,7 +8,9 @@ import Test.QuickCheck
 import Control.Monad
 import Control.Applicative
 
-import Data.Prizm.Color.CIE as C
+import Data.Prizm.Color.CIE.XYZ as X
+import Data.Prizm.Color.CIE.LAB as LB
+import Data.Prizm.Color.CIE.LCH as LC
 import Data.Prizm.Color.Transform
 import Data.Prizm.Types
 
@@ -29,17 +31,17 @@ rN = roundN 11
 xyz2LAB :: CIEXYZ Double -> Bool
 xyz2LAB v =
     let nv = tN <$> v
-    in (rN <$> C.toXYZ(C.toLAB nv)) == nv
+    in (rN <$> LB.toXYZ(X.toLAB nv)) == nv
 
 lab2XYZ :: CIELAB Double -> Bool
 lab2XYZ v =
     let nv = tN <$> v
-    in (rN <$> C.toLAB(C.toXYZ nv)) == nv
+    in (rN <$> X.toLAB(LB.toXYZ nv)) == nv
 
 lab2LCH :: CIELAB Double -> Bool
 lab2LCH v =
     let nv = tN <$> v
-    in (rN <$> C.lchToLAB(C.toLCH nv)) == nv
+    in (rN <$> LC.toLAB(LB.toLCH nv)) == nv
 
 tests = [
     testProperty "CIE XYZ <-> CIE L*a*b*" xyz2LAB,

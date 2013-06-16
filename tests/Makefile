@@ -1,7 +1,7 @@
 all: build test clean
 
 build:
-	ghc -package test-framework -package test-framework-quickcheck -package test-framework-hunit -threaded QC.hs -o RunTests
+	ghc -package test-framework -package test-framework-quickcheck2 -package QuickCheck-2.5.1.1 -threaded QC.hs -o RunTests
 
 test:
 	./RunTests --maximum-generated-tests=1000 +RTS -N2

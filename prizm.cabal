@@ -1,5 +1,5 @@
 Name:                prizm
-Version:             0.2.1.0
+Version:             0.3.0.0
 Synopsis:            A haskell library for computing with colors
 
 Description:         Prizm can convert between many different color
@@ -39,6 +39,9 @@ library
     Data.Prizm.Color.Transform
     Data.Prizm.Color.SRGB
     Data.Prizm.Color.CIE
+    Data.Prizm.Color.CIE.XYZ
+    Data.Prizm.Color.CIE.LAB
+    Data.Prizm.Color.CIE.LCH
     Data.Prizm.Color.Matrices.RGB
     Data.Prizm.Color.Matrices.XYZ
   
@@ -62,4 +65,5 @@ test-suite tests
     base >= 4,
     QuickCheck >= 2.5,
     test-framework >= 0.8,
-    test-framework-quickcheck2 >= 0.3.0
+    test-framework-quickcheck2 >= 0.3.0,
+    test-framework-hunit >= 0.3.0
