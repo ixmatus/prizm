@@ -1,6 +1,6 @@
 module Data.Prizm.Types where
 
-import Control.Applicative
+import           Control.Applicative
 
 newtype RGBtoXYZ = RGBtoXYZ [[Double]] deriving (Eq, Ord, Show)
 newtype XYZtoRGB = XYZtoRGB [[Double]] deriving (Eq, Ord, Show)

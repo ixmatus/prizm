@@ -8,9 +8,9 @@ module Data.Prizm.Color (
 , interpolate
 ) where
 
-import Control.Applicative hiding ((<|>))
+import           Control.Applicative hiding ((<|>))
 
-import Data.Prizm.Types
+import           Data.Prizm.Types
 
 pct :: Integer -> Double
 pct = (/100) . fromIntegral . (max (-100)) . (min 100)
@@ -48,11 +48,11 @@ chroma :: CIELCH Double -> Percent -> CIELCH Double
 chroma (CIELCH l c h) w = (CIELCH l (clamp (c + (120*(pct (pctClamp w)))) 120.0) h)
 
 -- | Interpolate two colors
--- 
+--
 -- Weight is applied left to right, so if a weight of 25% is supplied,
 -- then the color on the left will be multiplied by 25% and the second
 -- color will be multiplied by 75%.
--- 
+--
 -- CIE L*Ch is used because the interpolation between the colors is
 -- more accurate than L*ab, XYZ, and sRGB color spaces.
 interpolate :: Percent -> (CIELCH Double, CIELCH Double) -> CIELCH Double
