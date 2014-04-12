@@ -6,16 +6,17 @@ module Data.Prizm.Color.CIE
 , transformXYZ
 ) where
 
--- | exact rational of the "0.008856" value.
+-- | Exact rational of the "0.008856" value.
 v1 :: Double
 v1 = (6/29) ** 3
 
--- | exact rational of the "7.787" value.
+-- | Exact rational of the "7.787" value.
 v2 :: Double
 v2 = 1/3 * ((29/6) ** 2)
 
 -- 2deg observer, d65 illuminant
 -- [x,y,z]
+-- | Reference white, 2deg observer, d65 illuminant.
 refWhite :: [Double]
 refWhite = [95.047, 100.000, 108.883]
 

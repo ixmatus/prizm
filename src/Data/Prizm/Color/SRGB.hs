@@ -7,20 +7,20 @@ module Data.Prizm.Color.SRGB
 , clamp
 ) where
 
-import Numeric (showHex)
+import           Numeric                       (showHex)
 
-import Data.Monoid
-import Data.Prizm.Types
-import Data.Prizm.Color.Transform
-import Data.Prizm.Color.Matrices.RGB
+import           Data.Monoid
+import           Data.Prizm.Color.Matrices.RGB
+import           Data.Prizm.Color.Transform
+import           Data.Prizm.Types
 
-import Data.String
-import qualified Data.Text as T
-import Data.Text.Read as R
+import           Data.String
+import qualified Data.Text                     as T
+import           Data.Text.Read                as R
 
-import Control.Applicative
+import           Control.Applicative
 
--- | @rgbTransform@ transform an RGB integer to be computed against
+-- | @transform@ transform an RGB integer to be computed against
 -- a matrix.
 transform :: Integer -> Double
 transform v | dv > 0.04045 = (((dv + 0.055) / ap) ** 2.4) * 100
