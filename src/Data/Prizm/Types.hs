@@ -2,9 +2,13 @@ module Data.Prizm.Types where
 
 import           Control.Applicative
 
+-- | Working space matrix to convert from sRGB to CIE XYZ
 newtype RGBtoXYZ = RGBtoXYZ [[Double]] deriving (Eq, Ord, Show)
+
+-- | Working space matrix to convert from CIE XYZ to sRGB
 newtype XYZtoRGB = XYZtoRGB [[Double]] deriving (Eq, Ord, Show)
 
+-- | Hex format color code, eg '#AB9D92'
 type Hex = String
 
 type Percent = Integer
@@ -22,6 +26,7 @@ data CIELCH a = CIELCH !a !a !a
     deriving (Eq, Ord, Show)
 
 -- | Functor instances
+
 instance Functor RGB where
     fmap f (RGB r g b) = (RGB (f r) (f g) (f b))
 
