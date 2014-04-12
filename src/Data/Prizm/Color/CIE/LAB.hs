@@ -10,14 +10,14 @@ module Data.Prizm.Color.CIE.LAB
 , fromLCH
 ) where
 
-import Control.Applicative
+import           Control.Applicative
 
-import Data.Prizm.Types
-import Data.Prizm.Color.CIE             (refWhite, transformXYZ)
+import           Data.Prizm.Color.CIE     (refWhite, transformXYZ)
+import           Data.Prizm.Types
 
-import qualified Data.Prizm.Color.SRGB      as S
-import qualified Data.Prizm.Color.CIE.XYZ   as X
-import {-# SOURCE #-} qualified Data.Prizm.Color.CIE.LCH   as LC
+import {-# SOURCE #-} qualified Data.Prizm.Color.CIE.LCH as LC
+import qualified Data.Prizm.Color.CIE.XYZ as X
+import qualified Data.Prizm.Color.SRGB    as S
 
 transformLCH :: Double -> Double
 transformLCH v | v > 0      = (v / pi) * 180
@@ -27,7 +27,7 @@ transformLCH v | v > 0      = (v / pi) * 180
 toLCH :: CIELAB Double -> CIELCH Double
 toLCH (CIELAB l a b) =
     let h = transformLCH (atan2 b a)
-        c = sqrt ((a^2) + (b^2))
+        c = sqrt ((a^(2 :: Int)) + (b^(2 :: Int)))
     in CIELCH l c h
 
 -- | @fromLCH@ convert a LCH color to the LAB representation.

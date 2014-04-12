@@ -1,6 +1,5 @@
 module Data.Prizm.Color.CIE.LCH
-(
-  toRGB
+( toRGB
 , toLAB
 , toXYZ
 , toHex
@@ -10,9 +9,9 @@ module Data.Prizm.Color.CIE.LCH
 , fromXYZ
 ) where
 
-import Data.Prizm.Types
+import           Data.Prizm.Types
 
-import qualified Data.Prizm.Color.CIE.LAB as LB
+import {-# SOURCE #-} qualified Data.Prizm.Color.CIE.LAB as LB
 import qualified Data.Prizm.Color.CIE.XYZ as X
 
 -- | @toLAB@ convert an LCH color to a LAB representation.

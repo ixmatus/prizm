@@ -1,67 +1,76 @@
 module Data.Prizm.Color.CIE.XYZ
 (
+-- * Transform to ...
+-- ** ...RGB or Hex
   toRGB
 , toRGBMatrix
+, toHex
+
+-- ** ...CIE LAB or LCH
 , toLAB
 , toLCH
-, toHex
+
+-- * Transform from ...
+-- ** ...RGB or Hex
 , fromRGB
 , fromHex
+
+-- ** ...CIE LAB or LCH
 , fromLAB
 , fromLCH
 ) where
 
-import Control.Applicative
+import           Control.Applicative
 
-import Data.Prizm.Types
+import           Data.Prizm.Types
 
-import Data.Prizm.Color.Transform
-import Data.Prizm.Color.Matrices.XYZ
-import Data.Prizm.Color.CIE                 (v1, v2, refWhite)
+import           Data.Prizm.Color.CIE          (refWhite, v1, v2)
+import           Data.Prizm.Color.Matrices.XYZ
+import           Data.Prizm.Color.Transform
 
-import qualified Data.Prizm.Color.SRGB      as S
-import {-# SOURCE #-} qualified Data.Prizm.Color.CIE.LAB   as LB
-import {-# SOURCE #-} qualified Data.Prizm.Color.CIE.LCH   as LC
+import {-# SOURCE #-} qualified Data.Prizm.Color.CIE.LAB      as LB
+import {-# SOURCE #-} qualified Data.Prizm.Color.CIE.LCH      as LC
+import qualified Data.Prizm.Color.SRGB         as S
 
 
--- | @transformRGB@ transform an XYZ integer to be computed against
--- the xyzToRGB matrix.
+-- | Transform an XYZ integer to be computed against the xyzToRGB
+-- matrix.
 transformRGB :: Double -> Integer
 transformRGB v | v > 0.0031308 = min (round ((1.055 * (v ** (1 / 2.4)) - 0.055) * 255)) 255
                | otherwise     = min (round ((12.92 * v) * 255)) 255
 
+-- | Transform an LAB integer.
 transformLAB :: Double -> Double
 transformLAB v | v > v1    = v ** (1/3)
                | otherwise = (v2 * v) + (16 / 116)
 
--- | @toRGB@ convert a CIE color to an SRGB color.
--- 
+-- | Convert a CIE color to an SRGB color.
+--
 -- This function uses the default d65 illuminant matrix.
 toRGB :: CIEXYZ Double -> RGB Integer
 toRGB = (toRGBMatrix d65SRGB)
 
--- | @toRGBMatrix@ convert an XYZ color to an SRGB color using a
--- provided matrix.
+-- | Convert an XYZ color to an SRGB color.
 toRGBMatrix :: XYZtoRGB -> CIEXYZ Double -> RGB Integer
 toRGBMatrix (XYZtoRGB m) (CIEXYZ x y z) =
     let t = ZipList ((/100) <$> [x,y,z])
         [r,g,b] = (transformRGB) <$> ((zipTransform t) <$> m)
     in (S.clamp) <$> RGB r g b
 
--- | @fromRGB@ convenience function for converting to XYZ from RGB.
+-- | Convenience function to convert RGB to XYZ.
 fromRGB :: RGB Integer -> CIEXYZ Double
 fromRGB = S.toXYZ
 
--- | @toHex@ convenience function for converting XYZ straight to HEX.
+-- | Convenience function to convert XYZ to HEX.
 toHex :: CIEXYZ Double -> Hex
 toHex = S.toHex . toRGB
 
--- | @fromHex@ convenience function for converting to XYZ from HEX.
+-- | Convenience function to convert HEX to XYZ.
 fromHex :: Hex -> CIEXYZ Double
 fromHex = S.toXYZ . S.fromHex
 
--- | @toLAB@ convert an XYZ color to a LAB color.
--- 
+-- | Convert an XYZ color to a LAB color.
+--
 -- This function uses the default reference white (2deg observer, d65
 -- illuminant).
 toLAB :: CIEXYZ Double -> CIELAB Double
@@ -73,13 +82,14 @@ toLAB (CIEXYZ x y z) =
         b = 200 * (ty - tz)
     in CIELAB l a b
 
--- | @fromLAB@ convenience function for converting to XYZ from LAB.
+-- | Convenience function to convert LAB to XYZ.
 fromLAB :: CIELAB Double -> CIEXYZ Double
 fromLAB = LB.toXYZ
 
--- | @toLCH@ convenience function for converting XYZ straight to LAB.
+-- | Convenience function to convert XYZ to LAB.
 toLCH :: CIEXYZ Double -> CIELCH Double
 toLCH = LB.toLCH . toLAB
 
+-- | Convenience function to convert LCH to XYZ.
 fromLCH :: CIELCH Double -> CIEXYZ Double
 fromLCH = LC.toXYZ
