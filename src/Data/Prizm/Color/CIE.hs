@@ -1,3 +1,13 @@
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Data.Prizm.Color.CIE
+-- Copyright   :  (C) 2013 Parnell Springmeyer
+-- License     :  BSD3
+-- Maintainer  :  Parnell Springmeyer <parnell@ixmat.us>
+-- Stability   :  stable
+--
+-- Some basic utility functions for the CIE transformations.
+----------------------------------------------------------------------------
 module Data.Prizm.Color.CIE
 (
   v1

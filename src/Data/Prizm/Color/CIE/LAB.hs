@@ -1,3 +1,14 @@
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Data.Prizm.Color.CIE.LAB
+-- Copyright   :  (C) 2013 Parnell Springmeyer
+-- License     :  BSD3
+-- Maintainer  :  Parnell Springmeyer <parnell@ixmat.us>
+-- Stability   :  stable
+--
+-- Transformation functions and convenience functions, some imported
+-- from the other modules to ease conversion between representations.
+----------------------------------------------------------------------------
 module Data.Prizm.Color.CIE.LAB
 (
 -- * Transform to
