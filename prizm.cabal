@@ -40,21 +40,30 @@ description:
   and 100.
   .
   * sRGB <-> CIE XYZ
+  .
   * CIE XYZ <-> CIE L\*ab
+  .
   * CIE L\*ab <-> CIE L\*Ch
   .
   * Color interpolation
+  .
   * Tinting / Darkening
+  .
   * Lightness
+  .
   * Hue
+  .
   * Chroma/Saturation
   .
   /Formulas, Resources, and Links/
   .
-  <http://www.brucelindbloom.com/index.html?Info.html General Color Formulas, Data, and Algorithms>
-  <http://rip94550.wordpress.com/2011/07/04/color-cielab-and-tristimulus-xyz/ CIE Conversion Mathematics>
-  <http://www.easyrgb.com/index.php?X=MATH&H=01 Conversion Algorithm Sources>
-  <https://github.com/mikeemoo/ColorJizz-PHP/blob/master/src/MischiefCollective/ColorJizz/ColorJizz.php Good list of useful color manipulation formulas>
+  * <http://www.brucelindbloom.com/index.html?Info.html General Color Formulas, Data, and Algorithms>
+  .
+  * <http://rip94550.wordpress.com/2011/07/04/color-cielab-and-tristimulus-xyz/ CIE Conversion Mathematics>
+  .
+  * <http://www.easyrgb.com/index.php?X=MATH&H=01 Conversion Algorithm Sources>
+  .
+  * <https://github.com/mikeemoo/ColorJizz-PHP/blob/master/src/MischiefCollective/ColorJizz/ColorJizz.php Good list of useful color manipulation formulas>
 
 extra-source-files:
     LICENSE
