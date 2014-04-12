@@ -1,21 +1,21 @@
 module Data.Prizm.Color.CIE.XYZ
 (
--- * Transform to ...
--- ** ...RGB or Hex
+-- * Transform to
+-- ** RGB or Hex
   toRGB
 , toRGBMatrix
 , toHex
 
--- ** ...CIE LAB or LCH
+-- ** CIE LAB or LCH
 , toLAB
 , toLCH
 
--- * Transform from ...
--- ** ...RGB or Hex
+-- * Transform from
+-- ** RGB or Hex
 , fromRGB
 , fromHex
 
--- ** ...CIE LAB or LCH
+-- ** CIE LAB or LCH
 , fromLAB
 , fromLCH
 ) where
