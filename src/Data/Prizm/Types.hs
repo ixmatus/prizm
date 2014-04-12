@@ -1,3 +1,11 @@
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Data.Prizm.Types
+-- Copyright   :  (C) 2013 Parnell Springmeyer
+-- License     :  BSD3
+-- Maintainer  :  Parnell Springmeyer <parnell@ixmat.us>
+-- Stability   :  stable
+-----------------------------------------------------------------------------
 module Data.Prizm.Types where
 
 import           Control.Applicative

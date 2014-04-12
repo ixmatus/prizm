@@ -1,8 +1,16 @@
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Data.Prizm.Color.Matrices.RGB
+-- Copyright   :  (C) 2013 Parnell Springmeyer
+-- License     :  BSD3
+-- Maintainer  :  Parnell Springmeyer <parnell@ixmat.us>
+-- Stability   :  stable
+--
+-- Pre-calculated illuminant matrices: <http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html RGB to XYZ Matrix>.
+-----------------------------------------------------------------------------
 module Data.Prizm.Color.Matrices.RGB where
 
-import Data.Prizm.Types
-
--- http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html
+import           Data.Prizm.Types
 
 d65SRGB :: RGBtoXYZ
 d65SRGB = RGBtoXYZ [
