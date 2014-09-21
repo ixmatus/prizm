@@ -1,4 +1,6 @@
-* Welcome! [[https://budueba.com/hackage/prizm][https://hackage.haskell.org/package/prizm]]
+* Welcome!
+  [[https://hackage.haskell.org/package/prizm][https://img.shields.io/hackage/v/prizm.svg?style=flat]]
+
   `prizm` is a Haskell library for computing with colors. Specifically
   providing functions for transforming between different color spaces,
   interpolating colors and adjusting the tint, shade, hue, or
