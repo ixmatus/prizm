@@ -1,5 +1,6 @@
 * Welcome!
   [[https://hackage.haskell.org/package/prizm][https://img.shields.io/hackage/v/prizm.svg?style=flat]]
+  [[https://travis-ci.org/ixmatus/prizm][https://travis-ci.org/ixmatus/prizm.svg?branch=master]]
 
   `prizm` is a Haskell library for computing with colors. Specifically
   providing functions for transforming between different color spaces,
