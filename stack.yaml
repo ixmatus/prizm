@@ -1,0 +1,8 @@
+flags: {}
+nix:
+  packages:
+  - cabal-install
+extra-package-dbs: []
+packages:
+- '.'
+resolver: lts-7.14

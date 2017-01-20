@@ -67,8 +67,7 @@ description:
 
 extra-source-files:
     LICENSE
-    README.org
-    CHANGES
+    README.md
 
 source-repository head
   type:     git
