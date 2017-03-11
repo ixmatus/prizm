@@ -1,3 +1,7 @@
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeSynonymInstances  #-}
+
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Prizm.Color.SRGB
@@ -10,19 +14,13 @@
 -- conversion between S'RGB' and 'CIEXYZ'.
 ----------------------------------------------------------------------------
 module Data.Prizm.Color.SRGB
-(
--- * Convert to CIEXYZ
-  toXYZ
-, toXYZMatrix
-
--- * Convert to Hex
-, toHex
-, fromHex
+( toXYZMatrix
 , clamp
 ) where
 
 import           Numeric                       (showHex)
 
+import           Data.Convertible.Base
 import           Data.Monoid
 import           Data.Prizm.Color.Matrices.RGB
 import           Data.Prizm.Color.Transform
@@ -80,12 +78,20 @@ parse t =
     err     = error "Invalid color string"
 
 ------------------------------------------------------------------------------
--- Convert to XYZ
+-- Convertible
 ------------------------------------------------------------------------------
 
--- | Convert an S'RGB' value to a 'CIEXYZ' value.
-toXYZ :: RGB -> CIEXYZ
-toXYZ = (toXYZMatrix d65SRGB)
+instance Convertible RGB CIEXYZ where
+  -- | Convert an S'RGB' value to a 'CIEXYZ' value.
+  safeConvert = Right . (toXYZMatrix d65SRGB)
+
+instance Convertible RGB Hex where
+  -- | Convert an S'RGB' value to a hexadecimal representation.
+  safeConvert = Right . showRGB
+
+instance Convertible Hex RGB where
+  -- | Convert a hexadecimal value to an S'RGB'.
+  safeConvert = Right . parse . fromString
 
 -- | Convert an S'RGB' value to a 'CIEXYZ' given a pre-calculated
 -- illuminant matrix.
@@ -97,15 +103,3 @@ toXYZMatrix (RGBtoXYZ m) (RGB (RGBp r g b)) =
   let t = ZipList ((transform . fromIntegral) <$> (clamp <$> [r,g,b]))
       [x,y,z] = (roundN 3) <$> ((zipTransform t) <$> m)
   in CIEXYZ $ CIEXYZp x y z
-
-------------------------------------------------------------------------------
--- Convert to Hex
-------------------------------------------------------------------------------
-
--- | Convert an S'RGB' value to 'Hex'.
-toHex :: RGB -> Hex
-toHex = showRGB
-
--- | Convert a 'Hex' to an S'RGB'.
-fromHex :: Hex -> RGB
-fromHex = parse . fromString

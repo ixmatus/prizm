@@ -1,3 +1,7 @@
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeSynonymInstances  #-}
+
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Prizm.Color.CIE.XYZ
@@ -21,12 +25,13 @@ module Data.Prizm.Color.CIE.XYZ
 ) where
 
 import           Control.Applicative
-
-import           Data.Prizm.Types
+import           Data.Convertible.Base
+import           Data.Convertible.Utils
 
 import           Data.Prizm.Color.CIE          (refWhite, v1, v2)
 import           Data.Prizm.Color.Matrices.XYZ
 import           Data.Prizm.Color.Transform
+import           Data.Prizm.Types
 
 import qualified Data.Prizm.Color.SRGB         as S
 
@@ -46,14 +51,39 @@ transformLAB v | v > v1    = v ** (1/3)
                | otherwise = (v2 * v) + (16 / 116)
 
 ------------------------------------------------------------------------------
--- Transform to
+-- Convertible instances
 ------------------------------------------------------------------------------
 
--- | Convert a CIE color to an SRGB color.
---
--- This function uses the default d65 illuminant matrix.
-toRGB :: CIEXYZ -> RGB
-toRGB = (toRGBMatrix d65SRGB)
+instance Convertible CIEXYZ RGB where
+  -- | Convert a 'CIEXYZ' to an S'RGB'
+  --
+  -- This function uses the default d65 illuminant matrix.
+  safeConvert = Right . toRGBMatrix d65SRGB
+
+instance Convertible CIEXYZ Hex where
+  -- | Convert a 'CIEXYZ' to an S'RGB' hexadecimal color
+  safeConvert = convertVia (undefined :: RGB)
+
+instance Convertible CIEXYZ CIELCH where
+  -- | Convert a 'CIEXYZ' to a 'CIELCH' via 'CIELAB'
+  safeConvert = convertVia (undefined :: CIELAB)
+
+instance Convertible CIEXYZ CIELAB where
+  -- | Convert an 'CIEXYZ' to a 'CIELAB'
+  --
+  -- This function uses the default reference white (2deg observer,
+  -- d65 illuminant).
+  safeConvert (CIEXYZ (CIEXYZp x y z)) =
+    let v = getZipList $ ZipList ((/) <$> [x,y,z]) <*> ZipList refWhite
+        [tx,ty,tz] = (transformLAB) <$> v
+        l = (116 * ty) - 16
+        a = 500 * (tx - ty)
+        b = 200 * (ty - tz)
+    in Right $ CIELAB (CIELABp l a b)
+
+instance Convertible Hex CIEXYZ where
+  -- | Convert a hexadecimal S'RGB' color to a 'CIEXYZ'
+  safeConvert = convertVia (undefined :: RGB)
 
 -- | Convert an XYZ color to an SRGB color.
 --
@@ -64,44 +94,3 @@ toRGBMatrix (XYZtoRGB m) (CIEXYZ (CIEXYZp x y z)) =
     let t = ZipList ((/100) <$> [x,y,z])
         [r,g,b] = (fromIntegral . transformRGB) <$> ((zipTransform t) <$> m)
     in  RGB (S.clamp <$> RGBp r g b)
-
--- -- | Convenience function to convert XYZ to HEX.
--- toHex :: CIEXYZ -> Hex
--- toHex = S.toHex . toRGB
-
--- | Convert an XYZ color to a LAB color.
---
--- This function uses the default reference white (2deg observer, d65
--- illuminant).
-toLAB :: CIEXYZ -> CIELAB
-toLAB (CIEXYZ (CIEXYZp x y z)) =
-    let v = getZipList $ ZipList ((/) <$> [x,y,z]) <*> ZipList refWhite
-        [tx,ty,tz] = (transformLAB) <$> v
-        l = (116 * ty) - 16
-        a = 500 * (tx - ty)
-        b = 200 * (ty - tz)
-    in CIELAB $ CIELABp l a b
-
--- -- | Convenience function to convert XYZ to LAB.
--- toLCH :: CIEXYZ -> CIELCH
--- toLCH = LB.toLCH . toLAB
-
--- ------------------------------------------------------------------------------
--- -- Transform from
--- ------------------------------------------------------------------------------
-
--- -- | Convenience function to convert RGB to XYZ.
--- fromRGB :: RGB -> CIEXYZ
--- fromRGB = S.toXYZ
-
--- -- | Convenience function to convert HEX to XYZ.
--- fromHex :: Hex -> CIEXYZ
--- fromHex = S.toXYZ . S.fromHex
-
--- -- | Convenience function to convert LAB to XYZ.
--- fromLAB :: CIELAB -> CIEXYZ
--- fromLAB = LB.toXYZ
-
--- -- | Convenience function to convert LCH to XYZ.
--- fromLCH :: CIELCH -> CIEXYZ
--- fromLCH = LC.toXYZ

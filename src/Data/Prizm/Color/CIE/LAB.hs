@@ -1,3 +1,7 @@
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeSynonymInstances  #-}
+
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Prizm.Color.CIE.LAB
@@ -18,57 +22,47 @@ module Data.Prizm.Color.CIE.LAB
 ) where
 
 import           Control.Applicative
+import           Data.Convertible.Base
+import           Data.Convertible.Utils
 
-import           Data.Prizm.Color.CIE (refWhite, transformXYZ)
+import           Data.Prizm.Color.CIE   (refWhite, transformXYZ)
 import           Data.Prizm.Types
 
 ------------------------------------------------------------------------------
--- Transform to
+-- Convertible
 ------------------------------------------------------------------------------
 
--- -- | Convenience function to convert LAB to RGB.
--- toRGB :: CIELAB Double -> RGB Integer
--- toRGB = X.toRGB . toXYZ
-
--- -- | Convenience function to convert LAB to HEX.
--- toHex :: CIELAB Double -> Hex
--- toHex = X.toHex . toXYZ
-
--- | Convert a LAB color to the LCH representation.
-toLCH :: CIELAB -> CIELCH
-toLCH (CIELAB (CIELABp l a b)) =
+instance Convertible CIELAB CIELCH where
+  -- | Convert a 'CIELAB' to a 'CIELCH'
+  safeConvert (CIELAB (CIELABp l a b)) =
     let h = transformLCH (atan2 b a)
         c = sqrt ((a^(2 :: Int)) + (b^(2 :: Int)))
-    in CIELCH $ CIELCHp l c h
+    in Right $ CIELCH (CIELCHp l c hRight . (toXYZMatrix d65SRGB))
 
--- | Convert a LAB color to the XYZ representation.
-toXYZ :: CIELAB -> CIEXYZ
-toXYZ (CIELAB (CIELABp l a b)) =
+instance Convertible CIELAB CIEXYZ where
+  -- | Convert a 'CIELAB' to a 'CIEXYZ'
+  safeConvert (CIELAB (CIELABp l a b)) =
     let y = (l + 16) / 116
         x = a / 500 + y
         z = y - b / 200
         [nx,ny,nz] = getZipList $ ((*) <$> ZipList ((transformXYZ) <$> [x,y,z])) <*> ZipList refWhite
-    in CIEXYZ $ CIEXYZp nx ny nz
+    in Right $ CIEXYZ (CIEXYZp nx ny nz)
 
-------------------------------------------------------------------------------
--- Transform from
-------------------------------------------------------------------------------
+instance Convertible CIELAB RGB where
+  -- | Convert a 'CIELAB' to a S'RGB'
+  safeConvert = convertVia (undefined :: CIEXYZ)
 
--- -- | Convenience function to convert RGB to LAB.
--- fromRGB :: RGB Integer -> CIELAB Double
--- fromRGB = X.toLAB . S.toXYZ
+instance Convertible CIELAB Hex where
+  -- | Convert a 'CIELAB' to an S'RGB' hexadecimal color
+  safeConvert = convertVia (undefined :: RGB)
 
--- -- | Convenience function to convert HEX to LAB.
--- fromHex :: Hex -> CIELAB Double
--- fromHex = X.toLAB . X.fromHex
+instance Convertible RGB CIELAB where
+  -- | Convert a S'RGB' to a 'CIELAB'
+  safeConvert = convertVia (undefined :: CIEXYZ)
 
--- -- | Convert an LCH color to the LAB representation.
--- fromLCH :: CIELCH Double -> CIELAB Double
--- fromLCH = LC.toLAB
-
--- -- | Convert an XYZ color to LAB.
--- fromXYZ :: CIEXYZ Double -> CIELAB Double
--- fromXYZ = X.toLAB
+instance Convertible Hex CIELAB where
+  -- | Convert an S'RGB' hexadecimal color to a 'CIELAB'
+  safeConvert = convertVia (undefined :: RGB)
 
 transformLCH :: Double -> Double
 transformLCH v | v > 0      = (v / pi) * 180

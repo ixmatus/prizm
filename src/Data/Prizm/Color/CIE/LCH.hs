@@ -1,3 +1,7 @@
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeSynonymInstances  #-}
+
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Prizm.Color.CIE.LCH
@@ -9,18 +13,29 @@
 -- Transformation functions and convenience functions, some imported
 -- from the other modules to ease conversion between representations.
 ----------------------------------------------------------------------------
-module Data.Prizm.Color.CIE.LCH
-(
--- * Transform to
--- ** CIE LAB or XYZ
-  toLAB
-) where
+module Data.Prizm.Color.CIE.LCH where
+
+import           Data.Convertible.Base
+import           Data.Convertible.Utils
 
 import           Data.Prizm.Types
 
 ------------------------------------------------------------------------------
--- Transform to
+-- Convertible instances
 ------------------------------------------------------------------------------
+
+instance Convertible CIELCH CIELAB where
+  -- | Convert a 'CIELCH' to a 'CIELAB'
+  safeConvert (CIELCH (CIELCHp l c h)) =
+    let v = h * pi / 180
+    in Right $ CIELAB (CIELABp l ((cos v)*c) ((sin v)*c))
+
+instance Convertible CIELCH RGB where
+  -- | Convert a 'CIELCH' to a S'RGB'
+  safeConvert = convertVia (undefined :: CIEXYZ)
+
+instance Convertible CIELCH CIEXYZ where
+  safeConvert = convertVia (undefined :: CIELAB)
 
 -- -- | Convert from LCH to RGB.
 -- toRGB :: CIELCH -> RGB
@@ -30,11 +45,9 @@ import           Data.Prizm.Types
 -- toHex :: CIELCH -> Hex
 -- toHex = LB.toHex . toLAB
 
--- | Convert an LCH color to LAB.
-toLAB :: CIELCH -> CIELAB
-toLAB (CIELCH (CIELCHp l c h)) =
-    let v = h * pi / 180
-    in CIELAB $ CIELABp l ((cos v)*c) ((sin v)*c)
+
+
+
 
 -- -- | Convert from LCH to XYZ.
 -- toXYZ :: CIELCH -> CIEXYZ
