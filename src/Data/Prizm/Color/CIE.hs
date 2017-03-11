@@ -9,8 +9,7 @@
 -- Some basic utility functions for the CIE transformations.
 ----------------------------------------------------------------------------
 module Data.Prizm.Color.CIE
-(
-  v1
+( v1
 , v2
 , refWhite
 , transformXYZ
@@ -33,4 +32,4 @@ refWhite = [95.047, 100.000, 108.883]
 transformXYZ :: Double -> Double
 transformXYZ v | cv > v1   = cv
                | otherwise = (v - 16 / 116) / v2
-    where cv = v**3
+  where cv = v**3
