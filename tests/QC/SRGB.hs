@@ -2,25 +2,32 @@
 
 module QC.SRGB (tests) where
 
-import Test.Framework.Providers.QuickCheck2 (testProperty)
-import Test.QuickCheck
+import           Control.Monad
+import           Data.Convertible
+import           Numeric
+import           Test.Framework.Providers.QuickCheck2 (testProperty)
+import           Test.QuickCheck
 
-import Numeric
+import           Data.Prizm.Color.CIE
+import           Data.Prizm.Color.SRGB                as S
+import           Data.Prizm.Types
 
-import Control.Monad
+instance Arbitrary RGB where
+  arbitrary = do
+    r <- choose (0, 255)
+    g <- choose (0, 255)
+    b <- choose (0, 255)
+    return (RGB $ RGBp r g b)
 
-import Data.Prizm.Color.SRGB as S
-import Data.Prizm.Color.CIE.XYZ as X
-import Data.Prizm.Types
+rgb2XYZ :: RGB -> Bool
+rgb2XYZ gVal = gVal == iso
+  where
+    iso = convert ((convert gVal) :: CIEXYZ)
 
-instance Arbitrary (RGB Integer) where
-    arbitrary = liftM3 RGB (choose (0, 255)) (choose (0, 255)) (choose (0, 255))
-
-rgb2XYZ :: RGB Integer -> Bool
-rgb2XYZ v = X.toRGB(S.toXYZ v) == v
-
-rgb2HEX :: RGB Integer -> Bool
-rgb2HEX v = S.fromHex(S.toHex v) == v
+rgb2HEX :: RGB -> Bool
+rgb2HEX gVal = gVal == iso
+  where
+    iso = convert ((convert gVal) :: Hex)
 
 tests = [
     testProperty "SRGB <-> CIE XYZ" rgb2XYZ,

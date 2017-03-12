@@ -26,52 +26,56 @@ type Hex = String
 type Percent = Integer
 
 data RGBp a = RGBp !a !a !a
-    deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Show)
 newtype RGB = RGB (RGBp Word8)
+  deriving (Eq, Ord, Show)
 
 data CIEXYZp a = CIEXYZp !a !a !a
-    deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Show)
 newtype CIEXYZ = CIEXYZ (CIEXYZp Double)
+  deriving (Eq, Ord, Show)
 
 data CIELABp a = CIELABp !a !a !a
-    deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Show)
 newtype CIELAB = CIELAB (CIELABp Double)
+  deriving (Eq, Ord, Show)
 
 data CIELCHp a = CIELCHp !a !a !a
-    deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Show)
 newtype CIELCH = CIELCH (CIELCHp Double)
+  deriving (Eq, Ord, Show)
 
 -- | Functor instances
 instance Functor RGBp where
-    fmap f (RGBp r g b) = RGBp (f r) (f g) (f b)
+  fmap f (RGBp r g b) = RGBp (f r) (f g) (f b)
 
 instance Functor CIEXYZp where
-    fmap f (CIEXYZp x y z) = CIEXYZp (f x) (f y) (f z)
+  fmap f (CIEXYZp x y z) = CIEXYZp (f x) (f y) (f z)
 
 instance Functor CIELABp where
-    fmap f (CIELABp l a b) = CIELABp (f l) (f a) (f b)
+  fmap f (CIELABp l a b) = CIELABp (f l) (f a) (f b)
 
 instance Functor CIELCHp where
-    fmap f (CIELCHp l c h) = CIELCHp (f l) (f c) (f h)
+  fmap f (CIELCHp l c h) = CIELCHp (f l) (f c) (f h)
 
 -- | Applicative instances
 --
 -- Not sure how intuitive these instances are...though.
 instance Applicative RGBp where
-    pure t = RGBp t t t
-    (RGBp f1 f2 f3) <*> (RGBp r g b) = RGBp (f1 r) (f2 g) (f3 b)
+  pure t = RGBp t t t
+  (RGBp f1 f2 f3) <*> (RGBp r g b) = RGBp (f1 r) (f2 g) (f3 b)
 
 instance Applicative CIEXYZp where
-    pure t = CIEXYZp t t t
-    CIEXYZp f1 f2 f3 <*> CIEXYZp x y z = CIEXYZp (f1 x) (f2 y) (f3 z)
+  pure t = CIEXYZp t t t
+  CIEXYZp f1 f2 f3 <*> CIEXYZp x y z = CIEXYZp (f1 x) (f2 y) (f3 z)
 
 instance Applicative CIELABp where
-    pure t = CIELABp t t t
-    CIELABp f1 f2 f3 <*> CIELABp l a b = CIELABp (f1 l) (f2 a) (f3 b)
+  pure t = CIELABp t t t
+  CIELABp f1 f2 f3 <*> CIELABp l a b = CIELABp (f1 l) (f2 a) (f3 b)
 
 instance Applicative CIELCHp where
-    pure t = CIELCHp t t t
-    CIELCHp f1 f2 f3 <*> CIELCHp l c h = CIELCHp (f1 l) (f2 c) (f3 h)
+  pure t = CIELCHp t t t
+  CIELCHp f1 f2 f3 <*> CIELCHp l c h = CIELCHp (f1 l) (f2 c) (f3 h)
 
 -- | Presets for a color.
 class PresetColor c where
