@@ -2,16 +2,15 @@
 
 module Main (main) where
 
-import qualified QC.SRGB as SRGB
-import qualified QC.CIE as CIE
---import qualified QC.Color as Color
+import qualified QC.CIE         as CIE
+import qualified QC.SRGB        as SRGB
+import           Test.Framework (Test, defaultMain, testGroup)
 
-import Test.Framework (defaultMain, testGroup)
-
+main :: IO ()
 main = defaultMain tests
 
-tests = [
-      testGroup "srgb" SRGB.tests
-    , testGroup "cie" CIE.tests
---    , testGroup "color" Color.tests
-      ]
+tests :: [Test]
+tests =
+  [ testGroup "SRGB" SRGB.tests
+  , testGroup "CIE"  CIE.tests
+  ]

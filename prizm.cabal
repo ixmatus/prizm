@@ -5,7 +5,7 @@ homepage:            https://github.com/ixmatus/prizm
 license:             BSD3
 license-file:        LICENSE
 author:              Parnell Springmeyer
-maintainer:          parnell@ixmat.us
+maintainer:          parnell@digitalmentat.com
 copyright:           (c) 2013 Parnell Springmeyer
 category:            Graphics
 build-type:          Simple

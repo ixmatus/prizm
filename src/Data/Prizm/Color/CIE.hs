@@ -7,17 +7,23 @@
 -- Module      :  Data.Prizm.Color.CIE
 -- Copyright   :  (C) 2013 Parnell Springmeyer
 -- License     :  BSD3
--- Maintainer  :  Parnell Springmeyer <parnell@ixmat.us>
+-- Maintainer  :  Parnell Springmeyer <parnell@digitalmentat.com>
 -- Stability   :  stable
 --
--- Basic utility functions for the CIE transformations and CIE
--- convertible instances.
+-- Basic utility functions for the @CIE@ transformations and @CIE@
+-- convertible instances between the different color space
+-- representations within @CIE@ and @RGB@.
 ----------------------------------------------------------------------------
 module Data.Prizm.Color.CIE
-( v1
-, v2
+( clamp
 , refWhite
+, toRGBMatrix
+, transformLAB
+, transformLCH
+, transformRGB
 , transformXYZ
+, v1
+, v2
 ) where
 
 import           Control.Applicative
@@ -33,6 +39,8 @@ import qualified Data.Prizm.Color.SRGB         as S
 ------------------------------------------------------------------------------
 -- Utilities
 ------------------------------------------------------------------------------
+clamp :: Double -> Double -> Double
+clamp i clmp = max (min i clmp) 0.0
 
 -- | Exact rational of the "0.008856" value.
 v1 :: Double
@@ -57,16 +65,16 @@ transformLCH :: Double -> Double
 transformLCH v | v > 0      = (v / pi) * 180
                | otherwise  = 360 - ((abs v) / pi) * 180
 
+-- | Transform an LAB integer.
+transformLAB :: Double -> Double
+transformLAB v | v > v1    = v ** (1/3)
+               | otherwise = (v2 * v) + (16 / 116)
+
 -- | Transform an XYZ integer to be computed against the xyzToRGB
 -- matrix.
 transformRGB :: Double -> Integer
 transformRGB v | v > 0.0031308 = min (round ((1.055 * (v ** (1 / 2.4)) - 0.055) * 255)) 255
                | otherwise     = min (round ((12.92 * v) * 255)) 255
-
--- | Transform an LAB integer.
-transformLAB :: Double -> Double
-transformLAB v | v > v1    = v ** (1/3)
-               | otherwise = (v2 * v) + (16 / 116)
 
 -- | Convert an XYZ color to an SRGB color.
 --

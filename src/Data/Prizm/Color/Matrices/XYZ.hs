@@ -3,7 +3,7 @@
 -- Module      :  Data.Prizm.Color.Matrices.XYZ
 -- Copyright   :  (C) 2013 Parnell Springmeyer
 -- License     :  BSD3
--- Maintainer  :  Parnell Springmeyer <parnell@ixmat.us>
+-- Maintainer  :  Parnell Springmeyer <parnell@digitalmentat.com>
 -- Stability   :  stable
 --
 -- Pre-calculated illuminant matrices: <http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html RGB to XYZ Matrix>.

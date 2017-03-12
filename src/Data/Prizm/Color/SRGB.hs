@@ -7,15 +7,18 @@
 -- Module      :  Data.Prizm.Color.SRGB
 -- Copyright   :  (C) 2013 Parnell Springmeyer
 -- License     :  BSD3
--- Maintainer  :  Parnell Springmeyer <parnell@ixmat.us>
+-- Maintainer  :  Parnell Springmeyer <parnell@digitalmentat.com>
 -- Stability   :  stable
 --
 -- Transformation functions and convenience functions to do the base
 -- conversion between S'RGB' and 'CIEXYZ'.
 ----------------------------------------------------------------------------
 module Data.Prizm.Color.SRGB
-( toXYZMatrix
-, clamp
+( clamp
+, parse
+, showRGB
+, toXYZMatrix
+, transform
 ) where
 
 import           Numeric                       (showHex)

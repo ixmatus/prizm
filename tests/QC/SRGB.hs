@@ -1,16 +1,13 @@
 {-# LANGUAGE FlexibleInstances #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module QC.SRGB (tests) where
 
-import           Control.Monad
 import           Data.Convertible
-import           Numeric
+import           Data.Prizm.Color
+import           Test.Framework                       (Test)
 import           Test.Framework.Providers.QuickCheck2 as QuickCheck
 import           Test.QuickCheck
-
-import           Data.Prizm.Color.CIE
-import           Data.Prizm.Color.SRGB                as S
-import           Data.Prizm.Types
 
 instance Arbitrary RGB where
   arbitrary = do
@@ -29,7 +26,8 @@ rgb2HEX gVal = gVal == iso
   where
     iso = convert ((convert gVal) :: Hex)
 
+tests :: [Test]
 tests =
   [ QuickCheck.testProperty "SRGB <-> CIE XYZ" rgb2XYZ
-  , QuickCheck.testProperty "HEX  <-> SRGB"    rgb2HEX
+  , QuickCheck.testProperty "HEX  <-> SRGB   " rgb2HEX
   ]

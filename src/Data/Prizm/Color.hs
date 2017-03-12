@@ -3,7 +3,7 @@
 -- Module      :  Data.Prizm.Color
 -- Copyright   :  (C) 2013 Parnell Springmeyer
 -- License     :  BSD3
--- Maintainer  :  Parnell Springmeyer <parnell@ixmat.us>
+-- Maintainer  :  Parnell Springmeyer <parnell@digitalmentat.com>
 -- Stability   :  stable
 --
 -- 'Data.Prizm.Color' provides functions for blending colors,
@@ -32,10 +32,17 @@ module Data.Prizm.Color
   lightness
 , chroma
 , hue
+-- * Convertible Instances
+-- ** CIE Color Space
+, module Data.Prizm.Color.CIE
+-- ** SRGB Color Space
+, module Data.Prizm.Color.SRGB
 -- * Types
 , module Data.Prizm.Types
 ) where
 
+import           Data.Prizm.Color.CIE
+import           Data.Prizm.Color.SRGB hiding (clamp)
 import           Data.Prizm.Types
 
 ------------------------------------------------------------------------------
@@ -58,9 +65,3 @@ hue (CIELCH (CIELCHp l c h)) w =
 chroma :: CIELCH -> Percent -> CIELCH
 chroma (CIELCH (CIELCHp l c h)) w =
   CIELCH $ CIELCHp l (clamp (c + (120*(pct (pctClamp w)))) 120.0) h
-
-------------------------------------------------------------------------------
--- Utility Functions
-------------------------------------------------------------------------------
-clamp :: Double -> Double -> Double
-clamp i clmp = max (min i clmp) 0.0
