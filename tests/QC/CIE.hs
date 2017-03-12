@@ -5,7 +5,7 @@
 module QC.CIE (tests) where
 
 import           Test.Framework                       (Test)
-import           Test.Framework.Providers.QuickCheck2 (testProperty)
+import           Test.Framework.Providers.QuickCheck2 as QuickCheck
 import           Test.QuickCheck
 
 import           Control.Applicative
@@ -57,9 +57,9 @@ lab2LCH genVal = genVal == lch
 
 tests :: [Test]
 tests =
-  [ testProperty "CIE XYZ  <-> CIE L*a*b*" xyz2LAB
-  , testProperty "CIE L*ab <-> CIE XYZ"    lab2XYZ
-  , testProperty "CIE L*ab <-> CIE L*Ch"   lab2LCH
+  [ QuickCheck.testProperty "CIE XYZ  <-> CIE L*a*b*" xyz2LAB
+  , QuickCheck.testProperty "CIE L*ab <-> CIE XYZ"    lab2XYZ
+  , QuickCheck.testProperty "CIE L*ab <-> CIE L*Ch"   lab2LCH
   ]
 
 

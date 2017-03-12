@@ -5,7 +5,7 @@ module QC.SRGB (tests) where
 import           Control.Monad
 import           Data.Convertible
 import           Numeric
-import           Test.Framework.Providers.QuickCheck2 (testProperty)
+import           Test.Framework.Providers.QuickCheck2 as QuickCheck
 import           Test.QuickCheck
 
 import           Data.Prizm.Color.CIE
@@ -29,7 +29,7 @@ rgb2HEX gVal = gVal == iso
   where
     iso = convert ((convert gVal) :: Hex)
 
-tests = [
-    testProperty "SRGB <-> CIE XYZ" rgb2XYZ,
-    testProperty "HEX <-> SRGB" rgb2HEX
-      ]
+tests =
+  [ QuickCheck.testProperty "SRGB <-> CIE XYZ" rgb2XYZ
+  , QuickCheck.testProperty "HEX  <-> SRGB"    rgb2HEX
+  ]
