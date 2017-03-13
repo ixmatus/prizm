@@ -1,5 +1,5 @@
 name:                prizm
-version:             1.0.4
+version:             1.0.5
 synopsis:            Color transformations in different color spaces
 homepage:            https://github.com/ixmatus/prizm
 license:             BSD3
@@ -12,8 +12,8 @@ build-type:          Simple
 stability:           stable
 bug-reports:         https://github.com/ixmatus/prizm/issues
 package-url:         http://hackage.haskell.org/package/prizm
-tested-with:         GHC == 8.0.2
-cabal-version:       >=1.22.0
+tested-with:         GHC >= 7.8.4
+cabal-version:       >=1.18.1
 
 description:
   @prizm@ is a Haskell library for transforming colors. Specifically,
