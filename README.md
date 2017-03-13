@@ -34,7 +34,7 @@ transformations and color mutations in the `CIE L*Ch` space.
 All of these functions operate on color within the `CIE L*Ch`
 representation. The percentage values may range between -100 and 100.
 
-[General Color Formulas, Data, and Algorithms](http://www.brucelindbloom.com/index.html?Info.html)
-[CIE Conversion Mathematics](http://rip94550.wordpress.com/2011/07/04/color-cielab-and-tristimulus-xyz/)
-[Conversion Algorithm Sources](http://www.easyrgb.com/index.php?X=MATH&H=01)
-[Good list of useful color manipulation formulas](https://github.com/mikeemoo/ColorJizz-PHP/blob/master/src/MischiefCollective/ColorJizz/ColorJizz.php)
+- [General Color Formulas, Data, and Algorithms](http://www.brucelindbloom.com/index.html?Info.html)
+- [CIE Conversion Mathematics](http://rip94550.wordpress.com/2011/07/04/color-cielab-and-tristimulus-xyz/)
+- [Conversion Algorithm Sources](http://www.easyrgb.com/index.php?X=MATH&H=01)
+- [Good list of useful color manipulation formulas](https://github.com/mikeemoo/ColorJizz-PHP/blob/master/src/MischiefCollective/ColorJizz/ColorJizz.php)
