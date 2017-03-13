@@ -22,9 +22,6 @@
 -- you have a HEX or RGB color it first needs to be transformed to the
 -- 'CIEXYZ' color space, then the 'CIELAB' space, and finally to
 -- 'CIELCH'.
---
--- I may at some point try to generalize the function's types but I
--- wanted to first support 'CIELCH' as the transformation format.
 ----------------------------------------------------------------------------
 module Data.Prizm.Color
 (
@@ -50,18 +47,18 @@ import           Data.Prizm.Types
 ------------------------------------------------------------------------------
 -- | Adjust the lightness / darkness of a color.
 lightness :: CIELCH -> Percent -> CIELCH
-lightness (CIELCH (CIELCHp l c h)) w =
-  CIELCH $ CIELCHp (clamp (l + (100*(pct (pctClamp w)))) 100.0) c h
+lightness (CIELCH l c h) w =
+  CIELCH (clamp (l + (100*(pct (pctClamp w)))) 100.0) c h
 
 -- | Adjust the hue of a color.
 hue :: CIELCH -> Percent -> CIELCH
-hue (CIELCH (CIELCHp l c h)) w =
-  CIELCH $ CIELCHp l c (clamp (h + (360*(pct (pctClamp w)))) 360.0)
+hue (CIELCH l c h) w =
+  CIELCH l c (clamp (h + (360*(pct (pctClamp w)))) 360.0)
 
 -- | Adjust the saturation/chroma of a color.
 --
 -- A maximum chroma value of 120 is assumed here, anything more is
 -- generally considered out of gamut.
 chroma :: CIELCH -> Percent -> CIELCH
-chroma (CIELCH (CIELCHp l c h)) w =
-  CIELCH $ CIELCHp l (clamp (c + (120*(pct (pctClamp w)))) 120.0) h
+chroma (CIELCH l c h) w =
+  CIELCH l (clamp (c + (120*(pct (pctClamp w)))) 120.0) h

@@ -21,8 +21,7 @@ module Data.Prizm.Color.SRGB
 , transform
 ) where
 
-import           Numeric                       (showHex)
-
+import           Control.Applicative
 import           Data.Convertible.Base
 import           Data.Monoid
 import           Data.Prizm.Color.Matrices.RGB
@@ -32,8 +31,7 @@ import           Data.String
 import qualified Data.Text                     as T
 import           Data.Text.Read                as R
 import           Data.Word
-
-import           Control.Applicative
+import           Numeric                       (showHex)
 
 ------------------------------------------------------------------------------
 -- Utilities
@@ -53,25 +51,25 @@ clamp i = max (min i 255) 0
 
 -- All credit for the below three functions go to the HSColour module.
 
--- | Show a colour in hexadecimal form, e.g. \"#00aaff\"
+-- | Show a colour in hexadecimal form, e.g. @#00aaff@
 showRGB :: RGB -> Hex
 showRGB c =
   (("#"++) . showHex2 r' . showHex2 g' . showHex2 b') ""
  where
-  (RGB (RGBp r' g' b')) = c
+  (RGB r' g' b') = c
   showHex2 x | x <= 0xf = ("0"++) . showHex x
              | otherwise = showHex x
 
--- | Parse a 'Hex' into an 'RGB' type.
+-- | Parse a 'Hex' into an s'RGB' type.
 parse :: T.Text -> RGB
 parse t =
   case T.uncons t of
     Just ('#', cs) | T.all isHex cs ->
       case T.unpack cs of
-        [a, b, c, d, e, f, _g, _h] -> RGB $ RGBp (hex a b) (hex c d) (hex e f)
-        [a, b, c, d, e, f      ]   -> RGB $ RGBp (hex a b) (hex c d) (hex e f)
-        [a, b, c, _d            ]  -> RGB $ RGBp (hex a a) (hex b b) (hex c c)
-        [a, b, c               ]   -> RGB $ RGBp (hex a a) (hex b b) (hex c c)
+        [a, b, c, d, e, f, _g, _h] -> RGB (hex a b) (hex c d) (hex e f)
+        [a, b, c, d, e, f      ]   -> RGB (hex a b) (hex c d) (hex e f)
+        [a, b, c, _d            ]  -> RGB (hex a a) (hex b b) (hex c c)
+        [a, b, c               ]   -> RGB (hex a a) (hex b b) (hex c c)
         _                          -> err
     _                              -> err
 
@@ -85,7 +83,8 @@ parse t =
 ------------------------------------------------------------------------------
 
 instance Convertible RGB CIEXYZ where
-  -- | Convert an S'RGB' value to a 'CIEXYZ' value.
+  -- | Convert an S'RGB' value to a 'CIEXYZ' value with the default
+  -- @d65@ illuminant matrix.
   safeConvert = Right . (toXYZMatrix d65SRGB)
 
 instance Convertible RGB Hex where
@@ -96,13 +95,10 @@ instance Convertible Hex RGB where
   -- | Convert a hexadecimal value to an S'RGB'.
   safeConvert = Right . parse . fromString
 
--- | Convert an S'RGB' value to a 'CIEXYZ' given a pre-calculated
--- illuminant matrix.
---
--- It is recommended to use 'toXYZ' as it uses the most common
+-- | Convert an s'RGB' value to a 'CIEXYZ' given a pre-calculated
 -- illuminant matrix.
 toXYZMatrix :: RGBtoXYZ -> RGB -> CIEXYZ
-toXYZMatrix (RGBtoXYZ m) (RGB (RGBp r g b)) =
+toXYZMatrix (RGBtoXYZ m) (RGB r g b) =
   let t = ZipList ((transform . fromIntegral) <$> (clamp <$> [r,g,b]))
       [x,y,z] = (roundN 3) <$> ((zipTransform t) <$> m)
-  in CIEXYZ $ CIEXYZp x y z
+  in CIEXYZ x y z

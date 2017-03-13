@@ -1,5 +1,6 @@
 {-# LANGUAGE ConstrainedClassMethods #-}
 {-# LANGUAGE FlexibleInstances       #-}
+{-# LANGUAGE TypeFamilies            #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Prizm.Types
@@ -10,6 +11,7 @@
 -----------------------------------------------------------------------------
 module Data.Prizm.Types where
 
+import           Data.MonoTraversable
 import           Data.Word
 
 -- | Working space matrix to convert from sRGB to CIE XYZ.
@@ -20,62 +22,42 @@ newtype RGBtoXYZ = RGBtoXYZ [[Double]]
 newtype XYZtoRGB = XYZtoRGB [[Double]]
   deriving (Eq, Ord, Show)
 
--- | Hex format color code, eg '#AB9D92'.
+-- | Hexadecimal encoded color code with an octothorpe prefix; e.g:
+-- @#AB9D92@.
 type Hex = String
 
+-- | A percent value ranging from -100 to 100; e.g: -82%, 80%, 10%.
 type Percent = Integer
 
-data RGBp a = RGBp !a !a !a
-  deriving (Eq, Ord, Show)
-newtype RGB = RGB (RGBp Word8)
+data RGB = RGB !Word8 !Word8 !Word8
   deriving (Eq, Ord, Show)
 
-data CIEXYZp a = CIEXYZp !a !a !a
-  deriving (Eq, Ord, Show)
-newtype CIEXYZ = CIEXYZ (CIEXYZp Double)
+data CIEXYZ = CIEXYZ !Double !Double !Double
   deriving (Eq, Ord, Show)
 
-data CIELABp a = CIELABp !a !a !a
-  deriving (Eq, Ord, Show)
-newtype CIELAB = CIELAB (CIELABp Double)
+data CIELAB = CIELAB !Double !Double !Double
   deriving (Eq, Ord, Show)
 
-data CIELCHp a = CIELCHp !a !a !a
-  deriving (Eq, Ord, Show)
-newtype CIELCH = CIELCH (CIELCHp Double)
+data CIELCH = CIELCH !Double !Double !Double
   deriving (Eq, Ord, Show)
 
--- | Functor instances
-instance Functor RGBp where
-  fmap f (RGBp r g b) = RGBp (f r) (f g) (f b)
+-- | Monomorphic functor instances
+type instance Element RGB    = Word8
+type instance Element CIEXYZ = Double
+type instance Element CIELCH = Double
+type instance Element CIELAB = Double
 
-instance Functor CIEXYZp where
-  fmap f (CIEXYZp x y z) = CIEXYZp (f x) (f y) (f z)
+instance MonoFunctor RGB where
+  omap f (RGB r g b) = RGB (f r) (f g) (f b)
 
-instance Functor CIELABp where
-  fmap f (CIELABp l a b) = CIELABp (f l) (f a) (f b)
+instance MonoFunctor CIEXYZ where
+  omap f (CIEXYZ x y z) = CIEXYZ (f x) (f y) (f z)
 
-instance Functor CIELCHp where
-  fmap f (CIELCHp l c h) = CIELCHp (f l) (f c) (f h)
+instance MonoFunctor CIELAB where
+  omap f (CIELAB l a b) = CIELAB (f l) (f a) (f b)
 
--- | Applicative instances
---
--- Not sure how intuitive these instances are...though.
-instance Applicative RGBp where
-  pure t = RGBp t t t
-  (RGBp f1 f2 f3) <*> (RGBp r g b) = RGBp (f1 r) (f2 g) (f3 b)
-
-instance Applicative CIEXYZp where
-  pure t = CIEXYZp t t t
-  CIEXYZp f1 f2 f3 <*> CIEXYZp x y z = CIEXYZp (f1 x) (f2 y) (f3 z)
-
-instance Applicative CIELABp where
-  pure t = CIELABp t t t
-  CIELABp f1 f2 f3 <*> CIELABp l a b = CIELABp (f1 l) (f2 a) (f3 b)
-
-instance Applicative CIELCHp where
-  pure t = CIELCHp t t t
-  CIELCHp f1 f2 f3 <*> CIELCHp l c h = CIELCHp (f1 l) (f2 c) (f3 h)
+instance MonoFunctor CIELCH where
+  omap f (CIELCH l c h) = CIELCH (f l) (f c) (f h)
 
 -- | Presets for a color.
 class PresetColor c where
@@ -83,11 +65,13 @@ class PresetColor c where
   black :: c
 
 instance PresetColor CIELCH where
-  white = CIELCH $ CIELCHp 0.0 0.0 360.0
-  black = CIELCH $ CIELCHp 100.0 0.0 360.0
+  white = CIELCH 0.0 0.0 360.0
+  black = CIELCH 100.0 0.0 360.0
 
 -- | A blendable color.
 class Blendable c where
+
+  -- | Interpolate a color with another color, applying a weight.
   interpolate :: Percent -> (c,c) -> c
 
   -- | Blend two @Blendable@ colors using an interpolation weight of
@@ -95,41 +79,46 @@ class Blendable c where
   (<~>) :: c -> c -> c
   (<~>) l r = interpolate 50 (l,r)
 
-  -- | Shade a color by blending it using a weight and the color black.
+  -- | Shade a color by blending it using a weight and the
+  -- @PresetColor@ black.
   shade :: PresetColor c => c -> Percent -> c
   shade c w = interpolate (pctClamp w) (c, white)
 
-  -- | Tint a color by blending it using a weight and the color white.
+  -- | Tint a color by blending it using a weight and the
+  -- @PresetColor@ white.
   tint :: PresetColor c => c -> Percent -> c
   tint c w = interpolate (pctClamp w) (c, black)
 
--- | Interpolate two colors with a weight.
+-- | Interpolate two colors in the @CIE L*Ch* color space with a
+-- weight.
 --
 -- Weight is applied left to right, so if a weight of 25% is supplied,
 -- then the color on the left will be multiplied by 25% and the second
 -- color will be multiplied by 75%.
 instance Blendable CIELCH where
-  interpolate w (CIELCH a, CIELCH b) =
+  interpolate w ((CIELCH al ac ah), (CIELCH bl bc bh)) =
     let w' = pct $ pctClamp w
-        (CIELCHp l c h) = (-) <$> b <*> a
-        a' = (*w') <$> (CIELCHp l c (shortestPath h))
-    in CIELCH $ (+) <$> a' <*> a
+        (CIELCH l c h) = (CIELCH (al - bl) (ac - bc) (ah - bh))
+        (CIELCH nl nc nh) = omap (*w') (CIELCH l c (shortestPath h))
+    in CIELCH (nl + al) (nc + ac) (nh + ah)
 
 ------------------------------------------------------------------------------
 -- Utility Functions
 ------------------------------------------------------------------------------
+-- | Give the shortest path to the hue value.
 shortestPath :: Double -> Double
 shortestPath h | h > 180    = h - 360
                | h < (-180) = h + 360
                | otherwise  = h
 
--- pct :: Integer -> Double
--- pct = (/100) . fromIntegral . (max (-100)) . (min 100)
-
-pct :: Integer -> Double
+-- | Give the decimal value for the given "percent" value.
+--
+-- The @Percent@ value may range from -100 to 100.
+pct :: Percent -> Double
 pct i = fromIntegral m / 100
   where
     m = max (-100) $ min 100 i
 
-pctClamp :: Integer -> Integer
-pctClamp i = max (min i 100) 0
+-- | Clamp a @Percent@ value in the range -100 to 100.
+pctClamp :: Percent -> Percent
+pctClamp i = max (min i 100) (-100)

@@ -4,7 +4,9 @@
 
 module QC.CIE (tests) where
 
+import           Control.Monad                        (liftM3)
 import           Data.Convertible
+import           Data.MonoTraversable
 import           Data.Prizm.Color
 import           Data.Prizm.Color.Transform
 import           Test.Framework                       (Test)
@@ -12,42 +14,30 @@ import           Test.Framework.Providers.QuickCheck2 as QuickCheck
 import           Test.QuickCheck
 
 instance Arbitrary CIEXYZ where
-  arbitrary = do
-    x <- choose (0, 95.047)
-    y <- choose (0, 100.000)
-    z <- choose (0, 108.883)
-
-    return (CIEXYZ $ (rN <$> CIEXYZp x y z))
+  arbitrary = liftM3 CIEXYZ (choose (0, 95.047)) (choose (0, 100.000)) (choose (0, 108.883))
 
 instance Arbitrary CIELAB where
-  arbitrary = do
-    l <- choose (0, 100)
-    a <- choose ((-129), 129)
-    b <- choose ((-129), 129)
-    return (CIELAB $ (rN <$> CIELABp l a b))
+  arbitrary = liftM3 CIELAB (choose (0, 100)) (choose ((-129), 129)) (choose ((-129), 129))
 
 rN :: Double -> Double
 rN = roundN 11
 
 xyz2LAB :: CIEXYZ -> Bool
-xyz2LAB genVal = genVal == xyz
+xyz2LAB ((omap rN ) -> genVal) = genVal == xyz
   where
-    (CIEXYZ
-     (CIEXYZ . (fmap rN) -> xyz)) =
+    ((omap rN) -> xyz) =
       convert ((convert genVal) :: CIELAB)
 
 lab2XYZ :: CIELAB -> Bool
-lab2XYZ genVal = genVal == lab
+lab2XYZ ((omap rN ) -> genVal) = genVal == lab
   where
-    (CIELAB
-     (CIELAB . (fmap rN) -> lab)) =
+    ((omap rN) -> lab) =
       convert ((convert genVal) :: CIEXYZ)
 
 lab2LCH :: CIELAB -> Bool
-lab2LCH genVal = genVal == lch
+lab2LCH ((omap rN ) -> genVal) = genVal == lch
   where
-    (CIELAB
-     (CIELAB . (fmap rN) -> lch)) =
+    ((omap rN) -> lch) =
       convert ((convert genVal) :: CIELCH)
 
 tests :: [Test]

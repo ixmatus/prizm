@@ -3,6 +3,7 @@
 
 module QC.SRGB (tests) where
 
+import           Control.Monad                        (liftM3)
 import           Data.Convertible
 import           Data.Prizm.Color
 import           Test.Framework                       (Test)
@@ -10,11 +11,9 @@ import           Test.Framework.Providers.QuickCheck2 as QuickCheck
 import           Test.QuickCheck
 
 instance Arbitrary RGB where
-  arbitrary = do
-    r <- choose (0, 255)
-    g <- choose (0, 255)
-    b <- choose (0, 255)
-    return (RGB $ RGBp r g b)
+  arbitrary = liftM3 RGB (choose rgbRange) (choose rgbRange) (choose rgbRange)
+    where
+      rgbRange = (0, 255)
 
 rgb2XYZ :: RGB -> Bool
 rgb2XYZ gVal = gVal == iso

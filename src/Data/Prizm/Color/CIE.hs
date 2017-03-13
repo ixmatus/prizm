@@ -29,12 +29,10 @@ module Data.Prizm.Color.CIE
 import           Control.Applicative
 import           Data.Convertible.Base
 import           Data.Convertible.Utils
-
 import           Data.Prizm.Color.Matrices.XYZ
+import qualified Data.Prizm.Color.SRGB         as S
 import           Data.Prizm.Color.Transform
 import           Data.Prizm.Types
-
-import qualified Data.Prizm.Color.SRGB         as S
 
 ------------------------------------------------------------------------------
 -- Utilities
@@ -81,10 +79,10 @@ transformRGB v | v > 0.0031308 = min (round ((1.055 * (v ** (1 / 2.4)) - 0.055) 
 -- 'XYZtoRGB' is the pre-calculated illuminant matrix, it is
 -- preferable to use 'toRG' as it uses the most "common" one.
 toRGBMatrix :: XYZtoRGB -> CIEXYZ -> RGB
-toRGBMatrix (XYZtoRGB m) (CIEXYZ (CIEXYZp x y z)) =
+toRGBMatrix (XYZtoRGB m) (CIEXYZ x y z) =
     let t = ZipList ((/100) <$> [x,y,z])
-        [r,g,b] = (fromIntegral . transformRGB) <$> ((zipTransform t) <$> m)
-    in  RGB (S.clamp <$> RGBp r g b)
+        [r,g,b] = S.clamp <$> (fromIntegral . transformRGB) <$> ((zipTransform t) <$> m)
+    in RGB r g b
 
 ------------------------------------------------------------------------------
 -- Convertible
@@ -92,19 +90,19 @@ toRGBMatrix (XYZtoRGB m) (CIEXYZ (CIEXYZp x y z)) =
 
 instance Convertible CIELAB CIELCH where
   -- | Convert a 'CIELAB' to a 'CIELCH'
-  safeConvert (CIELAB (CIELABp l a b)) =
+  safeConvert (CIELAB l a b) =
     let h = transformLCH (atan2 b a)
         c = sqrt ((a^(2 :: Int)) + (b^(2 :: Int)))
-    in Right $ CIELCH (CIELCHp l c h)
+    in Right $ CIELCH l c h
 
 instance Convertible CIELAB CIEXYZ where
   -- | Convert a 'CIELAB' to a 'CIEXYZ'
-  safeConvert (CIELAB (CIELABp l a b)) =
+  safeConvert (CIELAB l a b) =
     let y = (l + 16) / 116
         x = a / 500 + y
         z = y - b / 200
         [nx,ny,nz] = getZipList $ ((*) <$> ZipList ((transformXYZ) <$> [x,y,z])) <*> ZipList refWhite
-    in Right $ CIEXYZ (CIEXYZp nx ny nz)
+    in Right $ CIEXYZ nx ny nz
 
 instance Convertible CIELAB RGB where
   -- | Convert a 'CIELAB' to a S'RGB'
@@ -124,9 +122,9 @@ instance Convertible Hex CIELAB where
 
 instance Convertible CIELCH CIELAB where
   -- | Convert a 'CIELCH' to a 'CIELAB'
-  safeConvert (CIELCH (CIELCHp l c h)) =
+  safeConvert (CIELCH l c h) =
     let v = h * pi / 180
-    in Right $ CIELAB (CIELABp l ((cos v)*c) ((sin v)*c))
+    in Right $ CIELAB l ((cos v)*c) ((sin v)*c)
 
 instance Convertible CIELCH RGB where
   -- | Convert a 'CIELCH' to a S'RGB'
@@ -154,13 +152,13 @@ instance Convertible CIEXYZ CIELAB where
   --
   -- This function uses the default reference white (2deg observer,
   -- d65 illuminant).
-  safeConvert (CIEXYZ (CIEXYZp x y z)) =
+  safeConvert (CIEXYZ x y z) =
     let v = getZipList $ ZipList ((/) <$> [x,y,z]) <*> ZipList refWhite
         [tx,ty,tz] = (transformLAB) <$> v
         l = (116 * ty) - 16
         a = 500 * (tx - ty)
         b = 200 * (ty - tz)
-    in Right $ CIELAB (CIELABp l a b)
+    in Right $ CIELAB l a b
 
 instance Convertible Hex CIEXYZ where
   -- | Convert a hexadecimal S'RGB' color to a 'CIEXYZ'
