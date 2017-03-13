@@ -33,6 +33,6 @@ module Data.Prizm.Color
 , module Data.Prizm.Types
 ) where
 
-import           Data.Prizm.Color.CIE
+import           Data.Prizm.Color.CIE  hiding (clamp)
 import           Data.Prizm.Color.SRGB hiding (clamp)
 import           Data.Prizm.Types
