@@ -4,7 +4,7 @@
 -- Module      :  Data.Prizm.Color.Transform
 -- Copyright   :  (C) 2013 Parnell Springmeyer
 -- License     :  BSD3
--- Maintainer  :  Parnell Springmeyer <parnell@ixmat.us>
+-- Maintainer  :  Parnell Springmeyer <parnell@digitalmentat.com>
 -- Stability   :  stable
 -----------------------------------------------------------------------------
 module Data.Prizm.Color.Transform where

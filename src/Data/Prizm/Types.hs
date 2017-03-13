@@ -1,66 +1,126 @@
+{-# LANGUAGE ConstrainedClassMethods #-}
+{-# LANGUAGE FlexibleInstances       #-}
+{-# LANGUAGE TypeFamilies            #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Prizm.Types
 -- Copyright   :  (C) 2013 Parnell Springmeyer
 -- License     :  BSD3
--- Maintainer  :  Parnell Springmeyer <parnell@ixmat.us>
+-- Maintainer  :  Parnell Springmeyer <parnell@digitalmentat.com>
 -- Stability   :  stable
 -----------------------------------------------------------------------------
 module Data.Prizm.Types where
 
-import           Control.Applicative
+import           Data.MonoTraversable
+import           Data.Word
 
--- | Working space matrix to convert from sRGB to CIE XYZ
-newtype RGBtoXYZ = RGBtoXYZ [[Double]] deriving (Eq, Ord, Show)
+-- | Working space matrix to convert from sRGB to CIE XYZ.
+newtype RGBtoXYZ = RGBtoXYZ [[Double]]
+  deriving (Eq, Ord, Show)
 
--- | Working space matrix to convert from CIE XYZ to sRGB
-newtype XYZtoRGB = XYZtoRGB [[Double]] deriving (Eq, Ord, Show)
+-- | Working space matrix to convert from CIE XYZ to sRGB.
+newtype XYZtoRGB = XYZtoRGB [[Double]]
+  deriving (Eq, Ord, Show)
 
--- | Hex format color code, eg '#AB9D92'
+-- | Hexadecimal encoded color code with an octothorpe prefix; e.g:
+-- @#AB9D92@.
 type Hex = String
 
+-- | A percent value ranging from -100 to 100; e.g: -82%, 80%, 10%.
 type Percent = Integer
 
-data RGB a = RGB !a !a !a
-    deriving (Eq, Ord, Show)
+-- | A color in the sRGB color space.
+data RGB = RGB !Word8 !Word8 !Word8
+  deriving (Eq, Ord, Show)
 
-data CIEXYZ a = CIEXYZ !a !a !a
-    deriving (Eq, Ord, Show)
+-- | A color in the CIE XYZ color space.
+data CIEXYZ = CIEXYZ !Double !Double !Double
+  deriving (Eq, Ord, Show)
 
-data CIELAB a = CIELAB !a !a !a
-    deriving (Eq, Ord, Show)
+-- | A color in the @CIE L*a*b*@ color space.
+data CIELAB = CIELAB !Double !Double !Double
+  deriving (Eq, Ord, Show)
 
-data CIELCH a = CIELCH !a !a !a
-    deriving (Eq, Ord, Show)
+-- | A color in the @CIE L*C*h(uv)@ color space.
+data CIELCH = CIELCH !Double !Double !Double
+  deriving (Eq, Ord, Show)
 
--- | Functor instances
+-- | Monomorphic functor instances for the color spaces.
+type instance Element RGB    = Word8
+type instance Element CIEXYZ = Double
+type instance Element CIELCH = Double
+type instance Element CIELAB = Double
 
-instance Functor RGB where
-    fmap f (RGB r g b) = (RGB (f r) (f g) (f b))
+instance MonoFunctor RGB where
+  omap f (RGB r g b) = RGB (f r) (f g) (f b)
 
-instance Functor CIEXYZ where
-    fmap f (CIEXYZ x y z) = (CIEXYZ (f x) (f y) (f z))
+instance MonoFunctor CIEXYZ where
+  omap f (CIEXYZ x y z) = CIEXYZ (f x) (f y) (f z)
 
-instance Functor CIELAB where
-    fmap f (CIELAB l a b) = (CIELAB (f l) (f a) (f b))
+instance MonoFunctor CIELAB where
+  omap f (CIELAB l a b) = CIELAB (f l) (f a) (f b)
 
-instance Functor CIELCH where
-    fmap f (CIELCH l c h) = (CIELCH (f l) (f c) (f h))
+instance MonoFunctor CIELCH where
+  omap f (CIELCH l c h) = CIELCH (f l) (f c) (f h)
 
--- | Applicative instances
+-- | Preset white and black for a color space.
+class PresetColor c where
+  white :: c
+  black :: c
 
-instance Applicative RGB where
-    pure t = RGB t t t
-    (RGB f1 f2 f3) <*> (RGB r g b) = (RGB (f1 r) (f2 g) (f3 b))
+-- | A blendable color.
+class BlendableColor c where
 
-instance Applicative CIEXYZ where
-    pure t = CIEXYZ t t t
-    CIEXYZ f1 f2 f3 <*> CIEXYZ x y z = CIEXYZ (f1 x) (f2 y) (f3 z)
+  -- | Interpolate a color with another color, applying a weight.
+  interpolate :: Percent -> (c,c) -> c
 
-instance Applicative CIELAB where
-    pure t = CIELAB t t t
-    CIELAB f1 f2 f3 <*> CIELAB l a b = CIELAB (f1 l) (f2 a) (f3 b)
+  -- | Blend two @Blendable@ colors using an interpolation weight of
+  -- 50%.
+  (<~>) :: c -> c -> c
+  (<~>) l r = interpolate 50 (l,r)
 
-instance Applicative CIELCH where
-    pure t = CIELCH t t t
-    CIELCH f1 f2 f3 <*> CIELCH l c h = CIELCH (f1 l) (f2 c) (f3 h)
+  -- | Shade a color by blending it using a weight and the
+  -- @PresetColor@ black.
+  shade :: PresetColor c => c -> Percent -> c
+  shade c w = interpolate (pctClamp w) (c, white)
+
+  -- | Tint a color by blending it using a weight and the
+  -- @PresetColor@ white.
+  tint :: PresetColor c => c -> Percent -> c
+  tint c w = interpolate (pctClamp w) (c, black)
+
+-- | An adjustable color.
+class AdjustableColor c where
+  -- | Adjust the lightness of a color
+  lightness :: c -> Percent -> c
+
+  -- | Adjust the chroma of a color
+  --
+  -- NB: not all color spaces will support this easily but it should
+  -- be possible to convert into a color space that does then convert
+  -- back
+  chroma    :: c -> Percent -> c
+
+  -- | Adjust the hue of a color
+  hue       :: c -> Percent -> c
+
+------------------------------------------------------------------------------
+-- Utilities
+------------------------------------------------------------------------------
+-- | Give the shortest path to the hue value.
+shortestPath :: Double -> Double
+shortestPath h | h > 180    = h - 360
+               | h < (-180) = h + 360
+               | otherwise  = h
+
+-- | Give the decimal value for the given "percent" value.
+--
+-- The @Percent@ value may range from -100 to 100.
+pct :: Percent -> Double
+pct i = fromIntegral m / 100
+  where
+    m = max (-100) $ min 100 i
+
+-- | Clamp a @Percent@ value in the range -100 to 100.
+pctClamp :: Percent -> Percent
+pctClamp i = max (min i 100) (-100)

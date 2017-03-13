@@ -1,0 +1,4 @@
+nix:
+  packages:
+  - cabal-install
+resolver: lts-8.3
