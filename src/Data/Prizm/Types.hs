@@ -82,12 +82,12 @@ class BlendableColor c where
   -- | Shade a color by blending it using a weight and the
   -- @PresetColor@ black.
   shade :: PresetColor c => c -> Percent -> c
-  shade c w = interpolate (pctClamp w) (c, white)
+  shade c w = interpolate (pctClamp w) (c, black)
 
   -- | Tint a color by blending it using a weight and the
   -- @PresetColor@ white.
   tint :: PresetColor c => c -> Percent -> c
-  tint c w = interpolate (pctClamp w) (c, black)
+  tint c w = interpolate (pctClamp w) (c, white)
 
 -- | An adjustable color.
 class AdjustableColor c where
