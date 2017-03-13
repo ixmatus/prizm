@@ -59,17 +59,13 @@ instance MonoFunctor CIELAB where
 instance MonoFunctor CIELCH where
   omap f (CIELCH l c h) = CIELCH (f l) (f c) (f h)
 
--- | Presets for a color.
+-- | Preset white and black for a color space.
 class PresetColor c where
   white :: c
   black :: c
 
-instance PresetColor CIELCH where
-  white = CIELCH 0.0 0.0 360.0
-  black = CIELCH 100.0 0.0 360.0
-
 -- | A blendable color.
-class Blendable c where
+class BlendableColor c where
 
   -- | Interpolate a color with another color, applying a weight.
   interpolate :: Percent -> (c,c) -> c
@@ -89,21 +85,23 @@ class Blendable c where
   tint :: PresetColor c => c -> Percent -> c
   tint c w = interpolate (pctClamp w) (c, black)
 
--- | Interpolate two colors in the @CIE L*Ch* color space with a
--- weight.
---
--- Weight is applied left to right, so if a weight of 25% is supplied,
--- then the color on the left will be multiplied by 25% and the second
--- color will be multiplied by 75%.
-instance Blendable CIELCH where
-  interpolate w ((CIELCH al ac ah), (CIELCH bl bc bh)) =
-    let w' = pct $ pctClamp w
-        (CIELCH l c h) = (CIELCH (al - bl) (ac - bc) (ah - bh))
-        (CIELCH nl nc nh) = omap (*w') (CIELCH l c (shortestPath h))
-    in CIELCH (nl + al) (nc + ac) (nh + ah)
+-- | An adjustable color.
+class AdjustableColor c where
+  -- | Adjust the lightness of a color
+  lightness :: c -> Percent -> c
+
+  -- | Adjust the chroma of a color
+  --
+  -- NB: not all color spaces will support this easily but it should
+  -- be possible to convert into a color space that does then convert
+  -- back
+  chroma    :: c -> Percent -> c
+
+  -- | Adjust the hue of a color
+  hue       :: c -> Percent -> c
 
 ------------------------------------------------------------------------------
--- Utility Functions
+-- Utilities
 ------------------------------------------------------------------------------
 -- | Give the shortest path to the hue value.
 shortestPath :: Double -> Double

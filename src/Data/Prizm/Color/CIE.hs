@@ -29,10 +29,44 @@ module Data.Prizm.Color.CIE
 import           Control.Applicative
 import           Data.Convertible.Base
 import           Data.Convertible.Utils
+import           Data.MonoTraversable
 import           Data.Prizm.Color.Matrices.XYZ
 import qualified Data.Prizm.Color.SRGB         as S
 import           Data.Prizm.Color.Transform
 import           Data.Prizm.Types
+
+instance PresetColor CIELCH where
+  white = CIELCH 0.0 0.0 360.0
+  black = CIELCH 100.0 0.0 360.0
+
+instance BlendableColor CIELCH where
+  -- | Interpolate two colors in the @CIE L*Ch* color space with a
+  -- weight.
+  --
+  -- Weight is applied left to right, so if a weight of 25% is supplied,
+  -- then the color on the left will be multiplied by 25% and the second
+  -- color will be multiplied by 75%.
+  interpolate w ((CIELCH al ac ah), (CIELCH bl bc bh)) =
+    let w' = pct $ pctClamp w
+        (CIELCH l c h) = (CIELCH (al - bl) (ac - bc) (ah - bh))
+        (CIELCH nl nc nh) = omap (*w') (CIELCH l c (shortestPath h))
+    in CIELCH (nl + al) (nc + ac) (nh + ah)
+
+instance AdjustableColor CIELCH where
+  -- | Adjust the lightness / darkness of a color.
+  lightness (CIELCH l c h) w =
+    CIELCH (clamp (l + (100*(pct (pctClamp w)))) 100.0) c h
+
+  -- | Adjust the hue of a color.
+  hue (CIELCH l c h) w =
+    CIELCH l c (clamp (h + (360*(pct (pctClamp w)))) 360.0)
+
+  -- | Adjust the saturation/chroma of a color.
+  --
+  -- A maximum chroma value of 120 is assumed here, anything more is
+  -- generally considered out of gamut.
+  chroma (CIELCH l c h) w =
+    CIELCH l (clamp (c + (120*(pct (pctClamp w)))) 120.0) h
 
 ------------------------------------------------------------------------------
 -- Utilities

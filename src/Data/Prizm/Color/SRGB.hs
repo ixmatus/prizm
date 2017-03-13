@@ -33,10 +33,13 @@ import           Data.Text.Read                as R
 import           Data.Word
 import           Numeric                       (showHex)
 
+instance PresetColor RGB where
+  white = RGB 255 255 255
+  black = RGB 0   0   0
+
 ------------------------------------------------------------------------------
 -- Utilities
 ------------------------------------------------------------------------------
-
 -- | Transform an RGB integer to be computed against a matrix.
 transform :: Integer -> Double
 transform v | dv > 0.04045 = (((dv + 0.055) / ap) ** 2.4) * 100
@@ -81,7 +84,6 @@ parse t =
 ------------------------------------------------------------------------------
 -- Convertible
 ------------------------------------------------------------------------------
-
 instance Convertible RGB CIEXYZ where
   -- | Convert an S'RGB' value to a 'CIEXYZ' value with the default
   -- @d65@ illuminant matrix.
