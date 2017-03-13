@@ -1,11 +1,11 @@
 name:                prizm
-version:             1.0.1
-synopsis:            Compute with colors and differenct color spaces
+version:             1.0.2
+synopsis:            Color transformations in different color spaces
 homepage:            https://github.com/ixmatus/prizm
 license:             BSD3
 license-file:        LICENSE
 author:              Parnell Springmeyer
-maintainer:          parnell@digitalmentat.com
+maintainer:          parnell+hackage@digitalmentat.com
 copyright:           (c) 2013 Parnell Springmeyer
 category:            Graphics
 build-type:          Simple
