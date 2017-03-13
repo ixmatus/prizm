@@ -19,7 +19,7 @@ module Data.Prizm.Color.CIE
 , refWhite
 , toRGBMatrix
 , transformLAB
-, transformLCH
+, calcLCHHue
 , transformRGB
 , transformXYZ
 , v1
@@ -82,28 +82,43 @@ v1 = (6/29) ** 3
 v2 :: Double
 v2 = 1/3 * ((29/6) ** 2)
 
--- 2deg observer, d65 illuminant
--- [x,y,z]
+
 -- | Reference white, 2deg observer, d65 illuminant.
+--
+-- @[x,y,z]@
+--
+-- TODO: this should probably be a triple.
 refWhite :: [Double]
 refWhite = [95.047, 100.000, 108.883]
 
+-- | Transform a 'CIEXYZ' point.
+--
+-- TODO: should provide *much* better documentation on what this is
+-- actually doing in the algorithms.
 transformXYZ :: Double -> Double
 transformXYZ v | cv > v1   = cv
                | otherwise = (v - 16 / 116) / v2
   where cv = v**3
 
-transformLCH :: Double -> Double
-transformLCH v | v > 0      = (v / pi) * 180
+-- | Calculate the hue for a conversion to 'CIELCH' from the 'atan2'
+-- of the *a* and *b* color opponents of a 'CIELAB' color.
+--
+-- TODO: should provide *much* better documentation on what this is
+-- actually doing in the algorithms.
+calcLCHHue :: Double -> Double
+calcLCHHue v | v > 0      = (v / pi) * 180
                | otherwise  = 360 - ((abs v) / pi) * 180
 
--- | Transform an LAB integer.
+-- | Transform a 'CIELAB' point.
+--
+-- TODO: should provide *much* better documentation on what this is
+-- actually doing in the algorithms.
 transformLAB :: Double -> Double
 transformLAB v | v > v1    = v ** (1/3)
                | otherwise = (v2 * v) + (16 / 116)
 
--- | Transform an XYZ integer to be computed against the xyzToRGB
--- matrix.
+-- | Transform an 'CIEXYZ' 'Double' to be computed against the
+-- xyzToRGB matrix.
 transformRGB :: Double -> Integer
 transformRGB v | v > 0.0031308 = min (round ((1.055 * (v ** (1 / 2.4)) - 0.055) * 255)) 255
                | otherwise     = min (round ((12.92 * v) * 255)) 255
@@ -125,7 +140,7 @@ toRGBMatrix (XYZtoRGB m) (CIEXYZ x y z) =
 instance Convertible CIELAB CIELCH where
   -- | Convert a 'CIELAB' to a 'CIELCH'
   safeConvert (CIELAB l a b) =
-    let h = transformLCH (atan2 b a)
+    let h = calcLCHHue (atan2 b a)
         c = sqrt ((a^(2 :: Int)) + (b^(2 :: Int)))
     in Right $ CIELCH l c h
 

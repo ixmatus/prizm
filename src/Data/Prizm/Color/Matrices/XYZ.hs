@@ -12,12 +12,14 @@ module Data.Prizm.Color.Matrices.XYZ where
 
 import           Data.Prizm.Types
 
+-- TODO: this should probably be a vector of triples.
 d65SRGB :: XYZtoRGB
 d65SRGB = XYZtoRGB [
   [3.2404542, (-1.5371385), (-0.4985314)],
   [(-0.9692660), 1.8760108, 0.0415560],
   [0.0556434, (-0.2040259), 1.0572252]]
 
+-- TODO: this should probably be a vector of triples.
 d65Adobe :: XYZtoRGB
 d65Adobe = XYZtoRGB [
   [2.0413690],[(-0.5649464)],[(-0.3446944)],

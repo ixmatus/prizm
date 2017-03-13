@@ -29,19 +29,23 @@ type Hex = String
 -- | A percent value ranging from -100 to 100; e.g: -82%, 80%, 10%.
 type Percent = Integer
 
+-- | A color in the sRGB color space.
 data RGB = RGB !Word8 !Word8 !Word8
   deriving (Eq, Ord, Show)
 
+-- | A color in the CIE XYZ color space.
 data CIEXYZ = CIEXYZ !Double !Double !Double
   deriving (Eq, Ord, Show)
 
+-- | A color in the @CIE L*a*b*@ color space.
 data CIELAB = CIELAB !Double !Double !Double
   deriving (Eq, Ord, Show)
 
+-- | A color in the @CIE L*C*h(uv)@ color space.
 data CIELCH = CIELCH !Double !Double !Double
   deriving (Eq, Ord, Show)
 
--- | Monomorphic functor instances
+-- | Monomorphic functor instances for the color spaces.
 type instance Element RGB    = Word8
 type instance Element CIEXYZ = Double
 type instance Element CIELCH = Double
