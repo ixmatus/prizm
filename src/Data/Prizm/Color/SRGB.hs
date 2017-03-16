@@ -30,7 +30,6 @@ import           Data.Prizm.Types
 import           Data.String
 import qualified Data.Text                     as T
 import           Data.Text.Read                as R
-import           Data.Word
 import           Numeric                       (showHex)
 
 instance PresetColor RGB where
@@ -49,7 +48,7 @@ transform v | dv > 0.04045 = (((dv + 0.055) / ap) ** 2.4) * 100
 
 -- | Clamp a 'Word8' with an upper-bound of 255 (the maximum RGB
 -- value).
-clamp :: Word8 -> Word8
+clamp :: Integral a => a -> a
 clamp i = max (min i 255) 0
 
 -- All credit for the below three functions go to the HSColour module.

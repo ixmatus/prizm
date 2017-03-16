@@ -40,17 +40,16 @@ instance PresetColor CIELCH where
   black = CIELCH 100.0 0.0 360.0
 
 instance BlendableColor CIELCH where
-  -- | Interpolate two colors in the @CIE L*Ch* color space with a
+  -- | Interpolate two colors in the @CIE L*C*h@ color space with a
   -- weight.
   --
   -- Weight is applied left to right, so if a weight of 25% is supplied,
   -- then the color on the left will be multiplied by 25% and the second
   -- color will be multiplied by 75%.
   interpolate w ((CIELCH al ac ah), (CIELCH bl bc bh)) =
-    let w' = pct $ pctClamp w
-        (CIELCH l c h) = (CIELCH (al - bl) (ac - bc) (ah - bh))
-        (CIELCH nl nc nh) = omap (*w') (CIELCH l c (shortestPath h))
-    in CIELCH (nl + al) (nc + ac) (nh + ah)
+    let w' = pct w
+        (CIELCH nl nc nh) = omap (*w') (CIELCH (bl - al) (bc - ac) (shortestPath (bh - ah)))
+    in CIELCH (al + nl) (ac + nc) (ah + nh)
 
 instance AdjustableColor CIELCH where
   -- | Adjust the lightness / darkness of a color.
@@ -81,7 +80,6 @@ v1 = (6/29) ** 3
 -- | Exact rational of the "7.787" value.
 v2 :: Double
 v2 = 1/3 * ((29/6) ** 2)
-
 
 -- | Reference white, 2deg observer, d65 illuminant.
 --
@@ -120,8 +118,8 @@ transformLAB v | v > v1    = v ** (1/3)
 -- | Transform an 'CIEXYZ' 'Double' to be computed against the
 -- xyzToRGB matrix.
 transformRGB :: Double -> Integer
-transformRGB v | v > 0.0031308 = min (round ((1.055 * (v ** (1 / 2.4)) - 0.055) * 255)) 255
-               | otherwise     = min (round ((12.92 * v) * 255)) 255
+transformRGB v | v > 0.0031308 = min (round (255 * (1.055 * (v ** (1 / 2.4)) - 0.055))) 255
+               | otherwise     = min (round (255 * (12.92 * v))) 255
 
 -- | Convert an XYZ color to an SRGB color.
 --
@@ -130,7 +128,9 @@ transformRGB v | v > 0.0031308 = min (round ((1.055 * (v ** (1 / 2.4)) - 0.055) 
 toRGBMatrix :: XYZtoRGB -> CIEXYZ -> RGB
 toRGBMatrix (XYZtoRGB m) (CIEXYZ x y z) =
     let t = ZipList ((/100) <$> [x,y,z])
-        [r,g,b] = S.clamp <$> (fromIntegral . transformRGB) <$> ((zipTransform t) <$> m)
+        -- NB: be sure to clamp before converting to a Word8,
+        -- otherwise we can overflow!
+        [r,g,b] = (fromIntegral . S.clamp . transformRGB) <$> ((zipTransform t) <$> m)
     in RGB r g b
 
 ------------------------------------------------------------------------------
@@ -150,7 +150,7 @@ instance Convertible CIELAB CIEXYZ where
     let y = (l + 16) / 116
         x = a / 500 + y
         z = y - b / 200
-        [nx,ny,nz] = getZipList $ ((*) <$> ZipList ((transformXYZ) <$> [x,y,z])) <*> ZipList refWhite
+        [nx,ny,nz] = getZipList $ ((*) <$> ZipList (transformXYZ <$> [x,y,z])) <*> ZipList refWhite
     in Right $ CIEXYZ nx ny nz
 
 instance Convertible CIELAB RGB where
@@ -165,8 +165,16 @@ instance Convertible RGB CIELAB where
   -- | Convert a S'RGB' to a 'CIELAB'
   safeConvert = convertVia (undefined :: CIEXYZ)
 
+instance Convertible RGB CIELCH where
+  -- | Convert a S'RGB' to a 'CIELCH'
+  safeConvert = convertVia (undefined :: CIELAB)
+
 instance Convertible Hex CIELAB where
   -- | Convert an S'RGB' hexadecimal color to a 'CIELAB'
+  safeConvert = convertVia (undefined :: RGB)
+
+instance Convertible Hex CIELCH where
+  -- | Convert an S'RGB' hexadecimal color to a 'CIELCH'
   safeConvert = convertVia (undefined :: RGB)
 
 instance Convertible CIELCH CIELAB where
@@ -177,7 +185,7 @@ instance Convertible CIELCH CIELAB where
 
 instance Convertible CIELCH RGB where
   -- | Convert a 'CIELCH' to a S'RGB'
-  safeConvert = convertVia (undefined :: CIEXYZ)
+  safeConvert = convertVia (undefined :: CIELAB)
 
 instance Convertible CIELCH CIEXYZ where
   safeConvert = convertVia (undefined :: CIELAB)

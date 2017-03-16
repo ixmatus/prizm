@@ -119,7 +119,7 @@ shortestPath h | h > 180    = h - 360
 pct :: Percent -> Double
 pct i = fromIntegral m / 100
   where
-    m = max (-100) $ min 100 i
+    m = pctClamp i
 
 -- | Clamp a @Percent@ value in the range -100 to 100.
 pctClamp :: Percent -> Percent
