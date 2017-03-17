@@ -4,37 +4,32 @@
 
 -----------------------------------------------------------------------------
 -- |
--- Module      :  Data.Prizm.Color.SRGB
+-- Module      :  Data.Prizm.Color.RGB
 -- Copyright   :  (C) 2013 Parnell Springmeyer
 -- License     :  BSD3
 -- Maintainer  :  Parnell Springmeyer <parnell@digitalmentat.com>
 -- Stability   :  stable
 --
 -- Transformation functions and convenience functions to do the base
--- conversion between S'RGB' and 'CIEXYZ'.
+-- conversion between 'RGB' and 'CIEXYZ'.
 ----------------------------------------------------------------------------
-module Data.Prizm.Color.SRGB
+module Data.Prizm.Color.RGB
 ( clamp
-, parse
-, showRGB
-, toXYZMatrix
-, transform
+, module Data.Prizm.Color.RGB.Types
 ) where
 
 import           Control.Applicative
 import           Data.Convertible.Base
 import           Data.Monoid
+import           Data.Prizm.Color.CIE.Types    as CIE
 import           Data.Prizm.Color.Matrices.RGB
+import           Data.Prizm.Color.RGB.Types
 import           Data.Prizm.Color.Transform
 import           Data.Prizm.Types
 import           Data.String
 import qualified Data.Text                     as T
 import           Data.Text.Read                as R
 import           Numeric                       (showHex)
-
-instance PresetColor RGB where
-  white = RGB 255 255 255
-  black = RGB 0   0   0
 
 ------------------------------------------------------------------------------
 -- Utilities
@@ -83,8 +78,8 @@ parse t =
 ------------------------------------------------------------------------------
 -- Convertible
 ------------------------------------------------------------------------------
-instance Convertible RGB CIEXYZ where
-  -- | Convert an S'RGB' value to a 'CIEXYZ' value with the default
+instance Convertible RGB CIE.XYZ where
+  -- | Convert an S'RGB' value to a 'CIE.XYZ' value with the default
   -- @d65@ illuminant matrix.
   safeConvert = Right . (toXYZMatrix d65SRGB)
 
@@ -96,10 +91,10 @@ instance Convertible Hex RGB where
   -- | Convert a hexadecimal value to an S'RGB'.
   safeConvert = Right . parse . fromString
 
--- | Convert an s'RGB' value to a 'CIEXYZ' given a pre-calculated
+-- | Convert an s'RGB' value to a 'CIE.XYZ' given a pre-calculated
 -- illuminant matrix.
-toXYZMatrix :: RGBtoXYZ -> RGB -> CIEXYZ
+toXYZMatrix :: RGBtoXYZ -> RGB -> CIE.XYZ
 toXYZMatrix (RGBtoXYZ m) (RGB r g b) =
   let t = ZipList ((transform . fromIntegral) <$> (clamp <$> [r,g,b]))
       [x,y,z] = (roundN 3) <$> ((zipTransform t) <$> m)
-  in CIEXYZ x y z
+  in CIE.XYZ x y z

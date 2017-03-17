@@ -1,6 +1,6 @@
 name:                prizm
-version:             1.1.0
-synopsis:            Color transformations in different color spaces
+version:             2.0.0
+synopsis:            Convert colors to different color spaces, interpolate colors, and transform colors
 homepage:            https://github.com/ixmatus/prizm
 license:             BSD3
 license-file:        LICENSE
@@ -19,7 +19,7 @@ description:
   @prizm@ is a Haskell library for transforming colors. Specifically,
   providing functions for transforming between different color spaces
   (@CIE@ and @sRGB@), interpolating colors and adjusting the tint,
-  shade, hue, or lightness or a color.
+  shade, hue, or lightness of a color.
   .
   The inspiration for this library came from a desire to blend two
   colors represented in the @sRGB@ color space. My research about color
@@ -28,44 +28,6 @@ description:
   for blending because it most accurately represents how the human eye
   sees hue and therefore preserves (and blends) hue the most
   accurately.
-  .
-  /Colour Module/
-  .
-  There is a bit of overlap with the Haskell Colour Module; however,
-  this library is filling a couple of needs the other doesn't
-  satisfy. Primarily transformations and color mutations in the @CIE
-  L*Ch@ space.
-  .
-  /Supported Algorithms & Functions/
-  .
-  All of these functions operate on color within the @CIE L*Ch@ color
-  space. The percentage values may range between -100 and 100.
-  .
-  * @sRGB     <-> CIE XYZ @
-  .
-  * @CIE XYZ  <-> CIE L*ab@
-  .
-  * @CIE L*ab <-> CIE L*Ch@
-  .
-  * Color interpolation
-  .
-  * Tinting / Darkening
-  .
-  * Lightness
-  .
-  * Hue
-  .
-  * Chroma/Saturation
-  .
-  /Formulas, Resources, and Links/
-  .
-  * <http://www.brucelindbloom.com/index.html?Info.html General Color Formulas, Data, and Algorithms>
-  .
-  * <http://rip94550.wordpress.com/2011/07/04/color-cielab-and-tristimulus-xyz/ CIE Conversion Mathematics>
-  .
-  * <http://www.easyrgb.com/index.php?X=MATH&H=01 Conversion Algorithm Sources>
-  .
-  * <https://github.com/mikeemoo/ColorJizz-PHP/blob/master/src/MischiefCollective/ColorJizz/ColorJizz.php Good list of useful color manipulation formulas>
 
 extra-source-files:
     LICENSE
@@ -78,14 +40,18 @@ source-repository head
 library
   hs-source-dirs: src
   default-language: Haskell2010
-  exposed-modules:
-    Data.Prizm.Types
-    Data.Prizm.Color
-    Data.Prizm.Color.Transform
-    Data.Prizm.Color.SRGB
-    Data.Prizm.Color.CIE
+  other-modules:
+    Data.Prizm.Color.CIE.Types
+    Data.Prizm.Color.Constants
     Data.Prizm.Color.Matrices.RGB
     Data.Prizm.Color.Matrices.XYZ
+    Data.Prizm.Color.RGB.Types
+  exposed-modules:
+    Data.Prizm.Color
+    Data.Prizm.Color.CIE
+    Data.Prizm.Color.RGB
+    Data.Prizm.Color.Transform
+    Data.Prizm.Types
   
   ghc-options: -Wall -fno-warn-orphans
 
@@ -101,8 +67,10 @@ test-suite tests
   main-is:        Test.hs
   default-language: Haskell2010
   other-modules:
-    QC.SRGB
-    QC.CIE
+                QC.RGB
+                QC.CIE
+                HUnit.Blending
+                
 
   ghc-options:
     -Wall -threaded -rtsopts
@@ -111,6 +79,7 @@ test-suite tests
                 prizm,
                 base                       >= 4,
                 QuickCheck                 >= 2.5,
+                HUnit                      >= 1.5,
                 convertible                >= 1.1,
                 test-framework             >= 0.8,
                 mono-traversable           >= 1.0,
