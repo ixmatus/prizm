@@ -4,7 +4,7 @@
 
 `prizm` is a Haskell library for transforming colors. Specifically, providing
 functions for transforming between different color spaces (`CIE` and `sRGB`),
-interpolating colors and adjusting the tint, shade, hue, or lightness or a
+interpolating colors and adjusting the tint, shade, hue, or lightness of a
 color.
 
 The inspiration for this library came from a desire to blend two colors
