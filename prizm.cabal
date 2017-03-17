@@ -77,11 +77,11 @@ test-suite tests
 
   build-depends:
                 prizm,
-                base                       >= 4,
-                QuickCheck                 >= 2.5,
-                HUnit                      >= 1.5,
-                convertible                >= 1.1,
-                test-framework             >= 0.8,
-                mono-traversable           >= 1.0,
-                test-framework-quickcheck2 >= 0.3.0,
-                test-framework-hunit       >= 0.3.0
+                base,
+                QuickCheck,
+                HUnit,
+                convertible,
+                test-framework,
+                mono-traversable,
+                test-framework-quickcheck2,
+                test-framework-hunit
