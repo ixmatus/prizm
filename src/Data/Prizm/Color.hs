@@ -25,16 +25,10 @@
 module Data.Prizm.Color
 (
 -- * Color Transformations
-  interpolate
-, (<~>)
-, shade
-, tint
-, lightness
-, chroma
-, hue
+  BlendableColor(..)
+, AdjustableColor(..)
 -- * Preset Colors
-, white
-, black
+, PresetColor(..)
 -- * Individual Color Spaces
 -- ** CIE Color Space
 , module Data.Prizm.Color.CIE
