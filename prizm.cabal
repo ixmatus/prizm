@@ -1,5 +1,5 @@
 name:                prizm
-version:             2.0.0
+version:             2.0.1
 synopsis:            Convert colors to different color spaces, interpolate colors, and transform colors
 homepage:            https://github.com/ixmatus/prizm
 license:             BSD3
