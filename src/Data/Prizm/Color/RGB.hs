@@ -1,6 +1,7 @@
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeSynonymInstances  #-}
+{-# LANGUAGE ViewPatterns          #-}
 
 -----------------------------------------------------------------------------
 -- |
@@ -14,22 +15,21 @@
 -- conversion between 'RGB' and 'CIEXYZ'.
 ----------------------------------------------------------------------------
 module Data.Prizm.Color.RGB
-( clamp
-, module Data.Prizm.Color.RGB.Types
+( module Data.Prizm.Color.RGB.Types
 ) where
 
 import           Control.Applicative
 import           Data.Convertible.Base
 import           Data.Monoid
-import           Data.Prizm.Color.CIE.Types    as CIE
-import           Data.Prizm.Color.Matrices.RGB
+import           Data.Prizm.Color.CIE.Matrices.RGB
+import           Data.Prizm.Color.CIE.Types        as CIE
 import           Data.Prizm.Color.RGB.Types
 import           Data.Prizm.Color.Transform
 import           Data.Prizm.Types
 import           Data.String
-import qualified Data.Text                     as T
-import           Data.Text.Read                as R
-import           Numeric                       (showHex)
+import qualified Data.Text                         as T
+import           Data.Text.Read                    as R
+import           Numeric                           (showHex)
 
 ------------------------------------------------------------------------------
 -- Utilities
@@ -41,11 +41,6 @@ transform v | dv > 0.04045 = (((dv + 0.055) / ap) ** 2.4) * 100
   where dv = fromIntegral v / 255
         ap = 1.0 + 0.055
 
--- | Clamp a 'Word8' with an upper-bound of 255 (the maximum RGB
--- value).
-clamp :: Integral a => a -> a
-clamp i = max (min i 255) 0
-
 -- All credit for the below three functions go to the HSColour module.
 
 -- | Show a colour in hexadecimal form, e.g. @#00aaff@
@@ -53,7 +48,7 @@ showRGB :: RGB -> Hex
 showRGB c =
   (("#"++) . showHex2 r' . showHex2 g' . showHex2 b') ""
  where
-  (RGB r' g' b') = c
+  (unRGB -> ColorCoord(r',g',b')) = c
   showHex2 x | x <= 0xf = ("0"++) . showHex x
              | otherwise = showHex x
 
@@ -63,10 +58,10 @@ parse t =
   case T.uncons t of
     Just ('#', cs) | T.all isHex cs ->
       case T.unpack cs of
-        [a, b, c, d, e, f, _g, _h] -> RGB (hex a b) (hex c d) (hex e f)
-        [a, b, c, d, e, f      ]   -> RGB (hex a b) (hex c d) (hex e f)
-        [a, b, c, _d            ]  -> RGB (hex a a) (hex b b) (hex c c)
-        [a, b, c               ]   -> RGB (hex a a) (hex b b) (hex c c)
+        [a, b, c, d, e, f, _g, _h] -> mkRGB (hex a b) (hex c d) (hex e f)
+        [a, b, c, d, e, f      ]   -> mkRGB (hex a b) (hex c d) (hex e f)
+        [a, b, c, _d            ]  -> mkRGB (hex a a) (hex b b) (hex c c)
+        [a, b, c               ]   -> mkRGB (hex a a) (hex b b) (hex c c)
         _                          -> err
     _                              -> err
 
@@ -94,7 +89,7 @@ instance Convertible Hex RGB where
 -- | Convert an s'RGB' value to a 'CIE.XYZ' given a pre-calculated
 -- illuminant matrix.
 toXYZMatrix :: RGBtoXYZ -> RGB -> CIE.XYZ
-toXYZMatrix (RGBtoXYZ m) (RGB r g b) =
+toXYZMatrix (Matrix m) (unRGB -> ColorCoord(r,g,b)) =
   let t = ZipList ((transform . fromIntegral) <$> (clamp <$> [r,g,b]))
       [x,y,z] = (roundN 3) <$> ((zipTransform t) <$> m)
-  in CIE.XYZ x y z
+  in CIE.mkXYZ x y z
