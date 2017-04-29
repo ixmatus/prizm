@@ -6,7 +6,6 @@ module QC.CIE (tests) where
 
 import           Control.Monad                        (liftM3)
 import           Data.Convertible
-import           Data.MonoTraversable
 import           Data.Prizm.Color
 import           Data.Prizm.Color.CIE                 as CIE
 import           Data.Prizm.Color.Transform
