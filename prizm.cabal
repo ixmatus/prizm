@@ -81,6 +81,5 @@ test-suite tests
                 HUnit,
                 convertible,
                 test-framework,
-                mono-traversable,
                 test-framework-quickcheck2,
                 test-framework-hunit
