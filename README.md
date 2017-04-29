@@ -40,8 +40,8 @@ main = do
   -- Print the RGB representation of the blended color
   putStrLn . show $ ((convert blended20) :: RGB)
 
-  -- Print the CSS-friendly hexadecimal RGB representation of the blended color
-  putStrLn . show $ ((convert blended20) :: Hex)
+  -- Print the RGB color in a hexadecimal encoding
+  putStrLn . show $ ((convert blended20) :: HexRGB)
 
       
 ```
