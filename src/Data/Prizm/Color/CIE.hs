@@ -41,8 +41,6 @@ import           Data.Prizm.Types
 -- Utilities
 ------------------------------------------------------------------------------
 
-
-
 -- | Clamp a 'Double' with a bottom of at least 0.0.
 clamp :: Double -> Double -> Double
 clamp i clmp = max (min i clmp) 0.0
@@ -126,78 +124,78 @@ labToXYZ (unLAB -> ColorCoord(l,a,b)) (Illuminant.Tristimulus refWhite) =
 -- Convertible
 ------------------------------------------------------------------------------
 instance Convertible CIE.LAB CIE.LCH where
-  -- | Convert a 'CIE.LAB' to a 'CIE.LCH'
+  -- | Convert a 'CIE.LAB' color to a 'CIE.LCH' color
   safeConvert (unLAB -> ColorCoord (l,a,b)) =
     let h = calcLCHHue (atan2 b a)
         c = sqrt ((a^(2 :: Int)) + (b^(2 :: Int)))
     in Right $ CIE.mkLCH l c h
 
 instance Convertible CIE.LAB CIE.XYZ where
-  -- | Convert a 'CIE.LAB' to a 'CIE.XYZ'
+  -- | Convert a 'CIE.LAB' color to a 'CIE.XYZ' color
   safeConvert lab = Right $ labToXYZ lab Illuminant.d65
 
 instance Convertible CIE.LAB RGB where
-  -- | Convert a 'CIE.LAB' to a S'RGB'
+  -- | Convert a 'CIE.LAB' color to a 256-cubed 'RGB' color
   safeConvert = convertVia (undefined :: CIE.XYZ)
 
-instance Convertible CIE.LAB Hex where
-  -- | Convert a 'CIE.LAB' to an S'RGB' hexadecimal color
+instance Convertible CIE.LAB HexRGB where
+  -- | Convert a 'CIE.LAB' color to a 256-cubed, 'HexRGB' encoded 'RGB' color
   safeConvert = convertVia (undefined :: RGB)
 
 instance Convertible RGB CIE.LAB where
-  -- | Convert a S'RGB' to a 'CIE.LAB'
+  -- | Convert a 256-cubed 'RGB' color to a 'CIE.LAB' color
   safeConvert = convertVia (undefined :: CIE.XYZ)
 
 instance Convertible RGB CIE.LCH where
-  -- | Convert a S'RGB' to a 'CIE.LCH'
+  -- | Convert a 256-cubed 'RGB' color to a 'CIE.LCH' color
   safeConvert = convertVia (undefined :: CIE.LAB)
 
-instance Convertible Hex CIE.LAB where
-  -- | Convert an S'RGB' hexadecimal color to a 'CIE.LAB'
+instance Convertible HexRGB CIE.LAB where
+  -- | Convert a 'HexRGB' encoded 256-cubed 'RGB' color to a 'CIE.LAB' color
   safeConvert = convertVia (undefined :: RGB)
 
-instance Convertible Hex CIE.LCH where
-  -- | Convert an S'RGB' hexadecimal color to a 'CIE.LCH'
+instance Convertible HexRGB CIE.LCH where
+  -- | Convert a 'HexRGB' encoded 256-cubed 'RGB' color to a 'CIE.LCH' color
   safeConvert = convertVia (undefined :: RGB)
 
 instance Convertible CIE.LCH CIE.LAB where
-  -- | Convert a 'CIE.LCH' to a 'CIE.LAB'
+  -- | Convert a 'CIE.LCH' color to a 'CIE.LAB' color
   safeConvert (unLCH -> ColorCoord (l,c,h)) =
     let v = h * pi / 180
     in Right $ CIE.mkLAB l ((cos v)*c) ((sin v)*c)
 
 instance Convertible CIE.LCH RGB where
-  -- | Convert a 'CIE.LCH' to a S'RGB'
+  -- | Convert a 'CIE.LCH' color to a 256-cubed 'RGB' color
   safeConvert = convertVia (undefined :: CIE.LAB)
 
-instance Convertible CIE.LCH Hex where
-  -- | Convert a 'CIE.LCH' to a RGB hexadecimal representation
+instance Convertible CIE.LCH HexRGB where
+  -- | Convert a 'CIE.LCH' color to a 256-cubed, 'HexRGB' encoded 'RGB' color
   safeConvert = convertVia (undefined :: RGB)
 
 instance Convertible CIE.LCH CIE.XYZ where
   safeConvert = convertVia (undefined :: CIE.LAB)
 
 instance Convertible CIE.XYZ RGB where
-  -- | Convert a 'CIE.XYZ' to an S'RGB'
+  -- | Convert a 'CIE.XYZ' color to a 256-cubed 'RGB' color
   --
   -- This function uses the default d65 illuminant matrix.
   safeConvert = Right . toRGBMatrix d65SRGB
 
-instance Convertible CIE.XYZ Hex where
-  -- | Convert a 'CIE.XYZ' to an S'RGB' hexadecimal color
+instance Convertible CIE.XYZ HexRGB where
+  -- | Convert a 'CIE.XYZ' color to a 256-cubed, 'HexRGB' encoded 'RGB' color
   safeConvert = convertVia (undefined :: RGB)
 
 instance Convertible CIE.XYZ CIE.LCH where
-  -- | Convert a 'CIE.XYZ' to a 'CIE.LCH' via 'CIE.LAB'
+  -- | Convert a 'CIE.XYZ' color to a 'CIE.LCH' color
   safeConvert = convertVia (undefined :: CIE.LAB)
 
 instance Convertible CIE.XYZ CIE.LAB where
-  -- | Convert an 'CIE.XYZ' to a 'CIE.LAB'
+  -- | Convert a 'CIE.XYZ' color to a 'CIE.LAB' color
   --
   -- This function uses the default reference white (2deg observer,
   -- d65 illuminant).
   safeConvert xyz = Right $ xyzToLAB xyz Illuminant.d65
 
-instance Convertible Hex CIE.XYZ where
-  -- | Convert a hexadecimal S'RGB' color to a 'CIE.XYZ'
+instance Convertible HexRGB CIE.XYZ where
+  -- | Convert a 'HexRGB' encoded 256-cubed 'RGB' color to the 'CIE.XYZ' color
   safeConvert = convertVia (undefined :: RGB)

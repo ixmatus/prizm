@@ -18,13 +18,13 @@ import           Data.Word
 clamp :: Integral a => a -> a
 clamp i = max (min i 255) 0
 
--- | A color in the @sRGB@ color space.
+-- | A color in the 256-cubed @RGB@ color space.
 newtype RGB = RGB {unRGB :: ColorCoord Word8 }
   deriving (Eq, Ord, Show)
 
--- | Produce an 'RGB' color.
+-- | Produce a 256-cubed 'RGB' color.
 --
--- NB: this function clamps each argument to a range of 0-255.
+-- NB: this function clamps each argument to the 0-255 range.
 mkRGB :: Int -- ^ Red color channel
       -> Int -- ^ Green color channel
       -> Int -- ^ Blue color channel

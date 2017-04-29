@@ -10,7 +10,7 @@
 -- Stability   :  stable
 -----------------------------------------------------------------------------
 module Data.Prizm.Types
-( Hex
+( HexRGB(..)
 , Percent
 , ColorCoord(..)
 , (<$$$>)
@@ -18,6 +18,7 @@ module Data.Prizm.Types
 ) where
 
 import           Data.Monoid
+import           Data.Text
 
 -- | Map a function over each element of a triple..
 (<$$$>) :: (a -> b) -> (a,a,a) -> (b,b,b)
@@ -35,9 +36,12 @@ import           Data.Monoid
 newtype ColorCoord a = ColorCoord (a, a, a)
   deriving (Show, Eq, Ord, Read)
 
--- | Hexadecimal encoded color code with an octothorpe prefix; e.g:
+-- | Hexadecimal encoded RGB color with an octothorpe prefix; e.g:
 -- @#AB9D92@.
-type Hex = String
+--
+-- Please see 'RGB.decodeHex'.
+newtype HexRGB = HexRGB { unHexRGB :: Text }
+  deriving (Show, Eq, Ord, Read)
 
 -- | A percent value ranging from -100 to 100; e.g: -82%, 80%, 10%.
 type Percent = Integer

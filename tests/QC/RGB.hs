@@ -24,10 +24,10 @@ rgb2XYZ gVal = gVal == iso
 rgb2HEX :: RGB -> Bool
 rgb2HEX gVal = gVal == iso
   where
-    iso = convert ((convert gVal) :: Hex)
+    iso = convert ((convert gVal) :: HexRGB)
 
 tests :: [Test]
 tests =
-  [ QuickCheck.testProperty "RGB <-> CIE XYZ" rgb2XYZ
-  , QuickCheck.testProperty "HEX <-> RGB   " rgb2HEX
+  [ QuickCheck.testProperty "RGB    <-> CIE XYZ" rgb2XYZ
+  , QuickCheck.testProperty "HexRGB <-> RGB    " rgb2HEX
   ]
