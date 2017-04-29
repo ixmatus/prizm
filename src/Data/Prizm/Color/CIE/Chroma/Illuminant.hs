@@ -9,7 +9,7 @@
 -- These values came from Bruce Lindbloom's website: <https://web.archive.org/web/20161110173539/http://www.brucelindbloom.com/index.html?Eqn_ChromAdapt.html Chromatic Adaptation>
 --
 -- For future reference (also found in the above linked website), here
--- is a list of reference white illuminant values:
+-- is a list of the reference white illuminant values:
 --
 -- *       X       Y       Z
 -- * @A    1.09850 1.00000 0.35585@
@@ -31,9 +31,7 @@ module Data.Prizm.Color.CIE.Chroma.Illuminant
 , e, f2, f7, f11
 ) where
 
--- | (Double, Double, Double)
---
--- TODO: make this a triple instead of a list
+-- | Reference white tristimulus value.
 newtype RefWhite = Tristimulus (Double, Double, Double)
   deriving (Eq, Ord, Show)
 

@@ -25,18 +25,21 @@ newtype LAB = LAB { unLAB :: ColorCoord Double }
 newtype LCH = LCH { unLCH :: ColorCoord Double }
   deriving (Eq, Ord, Show)
 
+-- | Produce a CIE XYZ color.
 mkXYZ :: Double -- ^ @X@ color point
       -> Double -- ^ @Y@ color point
       -> Double -- ^ @Z@ color point
       -> XYZ
 mkXYZ x y z = XYZ (ColorCoord (x,y,z))
 
+-- | Produce a CIE LAB color.
 mkLAB :: Double -- ^ @L@  color point
       -> Double -- ^ @*a@ color point
       -> Double -- ^ @*b@ color point
       -> LAB
 mkLAB l a b = LAB (ColorCoord (l,a,b))
 
+-- | Produce a CIE LCH color.
 mkLCH :: Double -- ^ @L@  color point
       -> Double -- ^ @*c@ color point
       -> Double -- ^ @*h@ color point
