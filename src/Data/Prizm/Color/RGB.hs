@@ -42,8 +42,6 @@ transform v | dv > 0.04045 = (((dv + 0.055) / ap) ** 2.4) * 100
   where dv = fromIntegral v / 255
         ap = 1.0 + 0.055
 
--- All credit for the below three functions go to the HSColour module.
-
 -- | Encode a 256-cubed 'RGB' color into a 'HexRGB', e.g. @#00aaff@
 encodeHex :: RGB -> HexRGB
 encodeHex (RGB rgb) = HexRGB (Text.pack $ "#" <> (Foldable.foldMap encode rgb))
