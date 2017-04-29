@@ -1,2 +1,29 @@
-language: haskell
-ghc: 8.0.2
+sudo: false
+language: c
+before_install:
+- export PATH=/opt/ghc/$GHCVER/bin:$PATH
+- if [ -n "$CABALVER" ]; then export PATH=/opt/cabal/$CABALVER/bin:$PATH; fi
+- export PATH=~/.local/bin:$PATH
+- if [ ! -e ~/.local/bin/stack ]; then mkdir -p ~/.local/bin; travis_retry curl -L
+  https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1
+  -C ~/.local/bin '*/stack'; fi
+- echo "$(ghc --version) [$(ghc --print-project-git-commit-id 2> /dev/null || echo
+  '?')]"
+- stack +RTS -N2 -RTS --version
+
+script:
+- stack --no-terminal --skip-ghc-check build --test
+- stack --no-terminal --skip-ghc-check sdist
+
+matrix:
+  include:
+  - env: GHCVER=8.0.2 STACK_YAML=stack.yaml
+    addons:
+      apt:
+        sources:
+        - hvr-ghc
+        packages:
+        - ghc-8.0.2
+
+before_install:
+  - export PATH=/opt/ghc/$GHCVER/bin:$PATH
