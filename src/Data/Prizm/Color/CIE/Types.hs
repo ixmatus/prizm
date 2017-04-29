@@ -11,27 +11,37 @@
 -----------------------------------------------------------------------------
 module Data.Prizm.Color.CIE.Types where
 
-import           Data.MonoTraversable
+import           Data.Prizm.Types
 
 -- | A color in the @CIE XYZ@ color space.
-data XYZ = XYZ !Double !Double !Double
+newtype XYZ = XYZ { unXYZ :: ColorCoord Double }
   deriving (Eq, Ord, Show)
 
 -- | A color in the @CIE L*a*b*@ color space.
-data LAB = LAB !Double !Double !Double
+newtype LAB = LAB { unLAB :: ColorCoord Double }
   deriving (Eq, Ord, Show)
 
 -- | A color in the @CIE L*C*h(uv)@ color space.
-data LCH = LCH !Double !Double !Double
+newtype LCH = LCH { unLCH :: ColorCoord Double }
   deriving (Eq, Ord, Show)
 
-type instance Element XYZ = Double
-type instance Element LCH = Double
-type instance Element LAB = Double
+-- | Produce a CIE XYZ color.
+mkXYZ :: Double -- ^ @X@ color point
+      -> Double -- ^ @Y@ color point
+      -> Double -- ^ @Z@ color point
+      -> XYZ
+mkXYZ x y z = XYZ (ColorCoord (x,y,z))
 
-instance MonoFunctor XYZ where
-  omap f (XYZ x y z) = XYZ (f x) (f y) (f z)
-instance MonoFunctor LAB where
-  omap f (LAB l a b) = LAB (f l) (f a) (f b)
-instance MonoFunctor LCH where
-  omap f (LCH l c h) = LCH (f l) (f c) (f h)
+-- | Produce a CIE LAB color.
+mkLAB :: Double -- ^ @L@  color point
+      -> Double -- ^ @*a@ color point
+      -> Double -- ^ @*b@ color point
+      -> LAB
+mkLAB l a b = LAB (ColorCoord (l,a,b))
+
+-- | Produce a CIE LCH color.
+mkLCH :: Double -- ^ @L@  color point
+      -> Double -- ^ @*c@ color point
+      -> Double -- ^ @*h@ color point
+      -> LCH
+mkLCH l c h = LCH (ColorCoord (l,c,h))

@@ -1,6 +1,7 @@
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeSynonymInstances  #-}
+{-# LANGUAGE ViewPatterns          #-}
 
 -----------------------------------------------------------------------------
 -- |
@@ -14,22 +15,22 @@
 -- conversion between 'RGB' and 'CIEXYZ'.
 ----------------------------------------------------------------------------
 module Data.Prizm.Color.RGB
-( clamp
-, module Data.Prizm.Color.RGB.Types
+( module Data.Prizm.Color.RGB.Types
 ) where
 
 import           Control.Applicative
+import           Data.Bifunctor                    as Bifunctor
 import           Data.Convertible.Base
+import qualified Data.Foldable                     as Foldable
 import           Data.Monoid
-import           Data.Prizm.Color.CIE.Types    as CIE
-import           Data.Prizm.Color.Matrices.RGB
+import           Data.Prizm.Color.CIE.Matrices.RGB
+import           Data.Prizm.Color.CIE.Types        as CIE
 import           Data.Prizm.Color.RGB.Types
 import           Data.Prizm.Color.Transform
 import           Data.Prizm.Types
-import           Data.String
-import qualified Data.Text                     as T
-import           Data.Text.Read                as R
-import           Numeric                       (showHex)
+import qualified Data.Text                         as Text
+import qualified Data.Text.Read                    as Text.Read
+import           Numeric                           (showHex)
 
 ------------------------------------------------------------------------------
 -- Utilities
@@ -41,39 +42,39 @@ transform v | dv > 0.04045 = (((dv + 0.055) / ap) ** 2.4) * 100
   where dv = fromIntegral v / 255
         ap = 1.0 + 0.055
 
--- | Clamp a 'Word8' with an upper-bound of 255 (the maximum RGB
--- value).
-clamp :: Integral a => a -> a
-clamp i = max (min i 255) 0
-
--- All credit for the below three functions go to the HSColour module.
-
--- | Show a colour in hexadecimal form, e.g. @#00aaff@
-showRGB :: RGB -> Hex
-showRGB c =
-  (("#"++) . showHex2 r' . showHex2 g' . showHex2 b') ""
+-- | Encode a 256-cubed 'RGB' color into a 'HexRGB', e.g. @#00aaff@
+encodeHex :: RGB -> HexRGB
+encodeHex (RGB rgb) = HexRGB (Text.pack $ "#" <> (Foldable.foldMap encode rgb))
  where
-  (RGB r' g' b') = c
-  showHex2 x | x <= 0xf = ("0"++) . showHex x
-             | otherwise = showHex x
+  encode x | x <= 0xf  = "0"<>(showHex x "")
+           | otherwise = showHex x ""
 
--- | Parse a 'Hex' into an s'RGB' type.
-parse :: T.Text -> RGB
-parse t =
-  case T.uncons t of
-    Just ('#', cs) | T.all isHex cs ->
-      case T.unpack cs of
-        [a, b, c, d, e, f, _g, _h] -> RGB (hex a b) (hex c d) (hex e f)
-        [a, b, c, d, e, f      ]   -> RGB (hex a b) (hex c d) (hex e f)
-        [a, b, c, _d            ]  -> RGB (hex a a) (hex b b) (hex c c)
-        [a, b, c               ]   -> RGB (hex a a) (hex b b) (hex c c)
-        _                          -> err
-    _                              -> err
+-- | Decode a 'HexRGB' encoded RGB color (e.g: #D60CD3) into 256-cubed
+-- 'RGB'.
+decodeHex :: HexRGB -> Either String RGB
+decodeHex (HexRGB orig@(Text.uncons -> cell)) =
+  case cell of
+    Just ('#', rest) ->
+      case Text.unpack rest of
+        [a, b, c, d, e, f, _g, _h]
+          -> mkRGB <$> hex a b <*> hex c d <*> hex e f
+
+        [a, b, c, d, e, f]
+          -> mkRGB <$> hex a b <*> hex c d <*> hex e f
+
+        [a, b, c, _d]
+          -> mkRGB <$> hex a a <*> hex b b <*> hex c c
+
+        [a, b, c]
+          -> mkRGB <$> hex a a <*> hex b b <*> hex c c
+        _ -> can'tDecode
+    _     -> can'tDecode
 
   where
-    hex a b = either err fst (R.hexadecimal (T.singleton a <> T.singleton b))
-    isHex a = (a >= 'a' && a <= 'f') || (a >= 'A' && a <= 'F') || (a >= '0' && a <= '9')
-    err     = error "Invalid color string"
+    hex :: Char -> Char -> Either String Int
+    hex a b = Bifunctor.second fst $ Text.Read.hexadecimal (Text.singleton a <> Text.singleton b)
+
+    can'tDecode = Left $ "cannot decode "++(Text.unpack orig)
 
 ------------------------------------------------------------------------------
 -- Convertible
@@ -83,18 +84,26 @@ instance Convertible RGB CIE.XYZ where
   -- @d65@ illuminant matrix.
   safeConvert = Right . (toXYZMatrix d65SRGB)
 
-instance Convertible RGB Hex where
-  -- | Convert an S'RGB' value to a hexadecimal representation.
-  safeConvert = Right . showRGB
+instance Convertible RGB HexRGB where
+  -- | Convert a 256-cubed 'RGB' color to a hexadecimal encoding.
+  safeConvert = Right . encodeHex
 
-instance Convertible Hex RGB where
-  -- | Convert a hexadecimal value to an S'RGB'.
-  safeConvert = Right . parse . fromString
+instance Convertible HexRGB RGB where
+  -- | Convert a hexadecimal value to an 'RGB'.
+  safeConvert v = Bifunctor.first convertibleError $ decodeHex v
+    where
+      convertibleError msg =
+        ConvertError
+        { convSourceValue  = show v
+        , convSourceType   = "HexRGB"
+        , convDestType     = "RGB"
+        , convErrorMessage = msg
+        }
 
 -- | Convert an s'RGB' value to a 'CIE.XYZ' given a pre-calculated
 -- illuminant matrix.
 toXYZMatrix :: RGBtoXYZ -> RGB -> CIE.XYZ
-toXYZMatrix (RGBtoXYZ m) (RGB r g b) =
+toXYZMatrix (Matrix m) (unRGB -> ColorCoord(r,g,b)) =
   let t = ZipList ((transform . fromIntegral) <$> (clamp <$> [r,g,b]))
       [x,y,z] = (roundN 3) <$> ((zipTransform t) <$> m)
-  in CIE.XYZ x y z
+  in CIE.mkXYZ x y z

@@ -1,4 +1,5 @@
 {-# LANGUAGE ConstrainedClassMethods #-}
+{-# LANGUAGE ViewPatterns            #-}
 
 -----------------------------------------------------------------------------
 -- |
@@ -38,10 +39,10 @@ module Data.Prizm.Color
 , module Data.Prizm.Types
 ) where
 
-import           Data.MonoTraversable
-import           Data.Prizm.Color.CIE ()
+import           Data.Prizm.Color.CIE
 import qualified Data.Prizm.Color.CIE as CIE
-import           Data.Prizm.Color.RGB ()
+import           Data.Prizm.Color.RGB hiding (clamp)
+import qualified Data.Prizm.Color.RGB as RGB
 import           Data.Prizm.Types
 
 -- | Preset white and black for a color space.
@@ -87,12 +88,12 @@ class AdjustableColor c where
   hue       :: c -> Percent -> c
 
 instance PresetColor CIE.LCH where
-  white = CIE.LCH 0.0 0.0 360.0
-  black = CIE.LCH 100.0 0.0 360.0
+  white = CIE.mkLCH 0.0 0.0 360.0
+  black = CIE.mkLCH 100.0 0.0 360.0
 
-instance PresetColor RGB where
-  white = RGB 255 255 255
-  black = RGB 0   0   0
+instance PresetColor RGB.RGB where
+  white = RGB.mkRGB 255 255 255
+  black = RGB.mkRGB 0   0   0
 
 instance BlendableColor CIE.LCH where
   -- | Interpolate two colors in the @CIE L*C*h@ color space with a
@@ -101,26 +102,26 @@ instance BlendableColor CIE.LCH where
   -- Weight is applied left to right, so if a weight of 25% is supplied,
   -- then the color on the left will be multiplied by 25% and the second
   -- color will be multiplied by 75%.
-  interpolate w ((CIE.LCH al ac ah), (CIE.LCH bl bc bh)) =
+  interpolate w ((CIE.unLCH -> ColorCoord(al,ac,ah)), (CIE.unLCH -> ColorCoord(bl,bc,bh))) =
     let w' = pct w
-        (CIE.LCH nl nc nh) = omap (*w') (CIE.LCH (bl - al) (bc - ac) (shortestPath (bh - ah)))
-    in CIE.LCH (al + nl) (ac + nc) (ah + nh)
+        ColorCoord(nl,nc,nh) = (*w') <$> (ColorCoord((bl - al),(bc - ac),(shortestPath (bh - ah))))
+    in CIE.mkLCH (al + nl) (ac + nc) (ah + nh)
 
 instance AdjustableColor CIE.LCH where
   -- | Adjust the lightness / darkness of a color.
-  lightness (CIE.LCH l c h) w =
-    CIE.LCH (clamp (l + (100*(pct (pctClamp w)))) 100.0) c h
+  lightness (CIE.unLCH -> ColorCoord(l,c,h)) w =
+    CIE.mkLCH (CIE.clamp (l + (100*(pct w))) 100.0) c h
 
   -- | Adjust the hue of a color.
-  hue (CIE.LCH l c h) w =
-    CIE.LCH l c (clamp (h + (360*(pct (pctClamp w)))) 360.0)
+  hue (CIE.unLCH -> ColorCoord(l,c,h)) w =
+    CIE.mkLCH l c (CIE.clamp (h + (360*(pct w))) 360.0)
 
   -- | Adjust the saturation/chroma of a color.
   --
   -- A maximum chroma value of 120 is assumed here, anything more is
   -- generally considered out of gamut.
-  chroma (CIE.LCH l c h) w =
-    CIE.LCH l (clamp (c + (120*(pct (pctClamp w)))) 120.0) h
+  chroma (CIE.unLCH -> ColorCoord(l,c,h)) w =
+    CIE.mkLCH l (CIE.clamp (c + (120*(pct w))) 120.0) h
 
 ------------------------------------------------------------------------------
 -- Utilities
@@ -142,7 +143,3 @@ pct i = fromIntegral m / 100
 -- | Clamp a 'Percent' value in the range -100 to 100.
 pctClamp :: Percent -> Percent
 pctClamp i = max (min i 100) (-100)
-
--- | Clamp a 'Double' with a bottom of at least 0.0.
-clamp :: Double -> Double -> Double
-clamp i clmp = max (min i clmp) 0.0

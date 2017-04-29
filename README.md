@@ -18,14 +18,15 @@ blends) hue the most accurately.
 ```haskell
 {-# LANGUAGE ScopedTypeVariables #-}
 
-import Data.Convertible
-import Data.Prizm.Color
-import Data.Prizm.Color.CIE as CIE
+import           Data.Convertible
+import           Data.Prizm.Color
+import           Data.Prizm.Color.CIE as CIE
 
+main :: IO ()
 main = do
   -- Convert RGB colors to the CIE.LCH color space
-  let green :: CIE.LCH = convert $ RGB 102 255 0
-      pink  :: CIE.LCH = convert $ RGB 255 0 255
+  let green :: CIE.LCH = convert $ mkRGB 102 255 0
+      pink  :: CIE.LCH = convert $ mkRGB 255 0 255
 
       -- Blend with a weight of 50%
       blended50 = pink <~> green
@@ -37,10 +38,11 @@ main = do
   putStrLn $ show blended50
 
   -- Print the RGB representation of the blended color
-  putStrLn . show $ (convert blended20) :: RGB
+  putStrLn . show $ ((convert blended20) :: RGB)
 
   -- Print the CSS-friendly hexadecimal RGB representation of the blended color
-  putStrLn . show $ (convert blended20) :: Hex
+  putStrLn . show $ ((convert blended20) :: Hex)
+
       
 ```
 
